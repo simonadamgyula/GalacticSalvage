@@ -1,0 +1,18 @@
+{
+    "python.analysis.typeCheckingMode": "strict",
+    "pylint.args": [
+        "--disable=missing-module-docstring",
+        "--disable=missing-class-docstring",
+        "--disable=missing-function-docstring",
+        "--disable=invalid-name",
+        "--disable=non-ascii-name",
+        "--disable=non-ascii-module-import",
+        "--disable=non-ascii-file-name",
+        "--disable=consider-using-enumerate",
+        "--disable=line-too-long",
+        "--disable=no-else-return",
+        "--disable=too-few-public-methods",
+        "--disable=cell-var-from-loop",
+        "--extension-pkg-whitelist=pygame"
+    ]
+}
