@@ -23,7 +23,7 @@ class Game:
             keys: pygame.key.ScancodeWrapper = pygame.key.get_pressed()
             self.player.rotate((keys[pygame.K_LEFT] or keys[pygame.K_a]) - (keys[pygame.K_RIGHT] or keys[pygame.K_d]))
 
-            # self.screen.fill((0, 0, 0))
+            self.screen.fill((0, 0, 0))
             self.player.update(self.screen, (keys[pygame.K_UP] or keys[pygame.K_w]))
 
             pygame.display.update()
