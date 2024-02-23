@@ -6,7 +6,7 @@ class Game:
     def __init__(self) -> None:
         pygame.init()
 
-        self.screen_resolution: tuple[int, int] = (1000, 800)
+        self.screen_resolution: tuple[int, int] = (1600, 850)
 
         self.screen: pygame.Surface = pygame.display.set_mode(self.screen_resolution)
         self.clock: pygame.time.Clock = pygame.time.Clock()
