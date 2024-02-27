@@ -23,11 +23,12 @@ class Game:
             keys: pygame.key.ScancodeWrapper = pygame.key.get_pressed()
             self.player.rotate(keys[pygame.K_LEFT] - keys[pygame.K_RIGHT])
 
-            self.player.update(self.screen, keys[pygame.K_UP])
-
             self.screen.fill((0, 0, 0))
-            self.player.draw(self.screen)
 
+            self.player.update(self.screen)
+
+            if keys[pygame.K_UP] or keys[pygame.K_w]:
+                self.player.accelerate()
             pygame.display.update()
 
             self.clock.tick(60)
