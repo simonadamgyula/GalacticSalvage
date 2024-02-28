@@ -1,3 +1,7 @@
 venv
 .idea
 /.idea/vcs.xml
+Pipfile.lock
+Pipfile
+__pycache__
+__pycache__/*
