@@ -7,7 +7,8 @@ class Game:
     def __init__(self) -> None:
         pygame.init()
 
-        self.screen_resolution: tuple[int, int] = (1600, 850)
+        pygame.display.set_caption("Galactic Salvage")
+        self.screen_resolution: tuple[int, int] = (1600, 900)
 
         self.screen: pygame.Surface = pygame.display.set_mode(self.screen_resolution)
         self.clock: pygame.time.Clock = pygame.time.Clock()
@@ -17,6 +18,7 @@ class Game:
         )
 
     def run(self) -> None:
+        bg_surf = self.background_generate()
         running: bool = True
         while running:
             for event in pygame.event.get():
@@ -28,7 +30,7 @@ class Game:
 
             self.player.update(self.screen, keys[pygame.K_UP])
 
-            self.background_generate()
+            self.screen.blit(bg_surf, (0, 0))
             self.player.draw(self.screen)
 
             pygame.display.update()
@@ -38,5 +40,5 @@ class Game:
         pygame.quit()
 
     def background_generate(self):
-        bg_surf = pygame.image.load("img/").convert_alpha()
+        bg_surf = pygame.image.load("img/background/space.png").convert_alpha()
         return bg_surf
