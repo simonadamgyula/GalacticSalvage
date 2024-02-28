@@ -1,7 +1,5 @@
-import math
 import pygame
-
-from grabber import Grabber
+import math
 
 
 class Player:
@@ -11,14 +9,11 @@ class Player:
 
         self.rotation_speed: float = 2
 
-        self.speed: float = 0
+        self.velocity: pygame.Vector2 = pygame.Vector2(0, 0)
         self.acceleration: float = 0.5
-        self.deceleration: float = 0.1
-        self.max_velocity: float = 5
+        self.max_velocity: float = 3
 
         self.image: pygame.Surface = pygame.image.load("img/spaceship/placeholder.png").convert_alpha()
-
-        self.grabber: Grabber = Grabber(self.position)
 
     def draw(self, screen: pygame.Surface) -> None:
         rotated_image: pygame.Surface = pygame.transform.rotate(self.image, self.direction)
@@ -26,27 +21,21 @@ class Player:
 
         screen.blit(rotated_image, rotated_rect.topleft)
 
-    def update(self, screen: pygame.Surface, move: bool = False) -> None:
-        self.grabber.update(self.position, screen)
-
-        self.accelerate(move)
+    def update(self, screen: pygame.Surface) -> None:
         self.move()
         self.draw(screen)
 
-    def accelerate(self, accelerate: bool = False) -> None:
-        self.speed += self.acceleration if accelerate else -self.deceleration
+    def accelerate(self) -> None:
+        acceleration: pygame.Vector2 = pygame.Vector2(
+            math.sin(math.radians(self.direction)),
+            math.cos(math.radians(self.direction))
+        ) * self.acceleration
 
-        if self.speed > self.max_velocity:
-
-            self.speed = self.max_velocity
-        elif self.speed < 0:
-            self.speed = 0
+        self.velocity += acceleration
+        self.velocity = self.velocity.clamp_magnitude(self.max_velocity)
 
     def move(self) -> None:
-        self.position -= pygame.Vector2(
-            math.sin(math.radians(self.direction)) * self.speed,
-            math.cos(math.radians(self.direction)) * self.speed
-        )
+        self.position -= self.velocity
 
     def rotate(self, direction: float) -> None:
         self.direction += direction * self.rotation_speed
