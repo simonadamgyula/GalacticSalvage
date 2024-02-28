@@ -29,10 +29,9 @@ class Grabber:
         self.rotate()
         self.extension_stage = ExtensionStage.EXTENDING
 
-    def update(self, position: pygame.Vector2, screen: pygame.Surface) -> None:
+    def update(self, position: pygame.Vector2) -> None:
         self.move(position)
         self.extension()
-        self.draw(screen)
 
     def move(self, position: pygame.Vector2) -> None:
         self.position = position
