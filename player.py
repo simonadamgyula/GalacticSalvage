@@ -1,5 +1,7 @@
-import pygame
 import math
+import pygame
+
+from grabber import Grabber
 
 
 class Player:
@@ -16,6 +18,8 @@ class Player:
 
         self.image: pygame.Surface = pygame.image.load("img/spaceship/placeholder.png").convert_alpha()
 
+        self.grabber: Grabber = Grabber(self.position)
+
     def draw(self, screen: pygame.Surface) -> None:
         rotated_image: pygame.Surface = pygame.transform.rotate(self.image, self.direction)
         rotated_rect: pygame.Rect = rotated_image.get_rect(center=self.image.get_rect(center=self.position).center)
@@ -23,6 +27,8 @@ class Player:
         screen.blit(rotated_image, rotated_rect.topleft)
 
     def update(self, screen: pygame.Surface, move: bool = False) -> None:
+        self.grabber.update(self.position, screen)
+
         self.accelerate(move)
         self.move()
         self.draw(screen)
