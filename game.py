@@ -24,15 +24,22 @@ class Game:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if pygame.mouse.get_pressed()[0]:
+                        self.player.grabber.extend()
 
             keys: pygame.key.ScancodeWrapper = pygame.key.get_pressed()
-            self.player.rotate(keys[pygame.K_LEFT] - keys[pygame.K_RIGHT])
+            self.player.rotate((keys[pygame.K_LEFT] or keys[pygame.K_a]) - (keys[pygame.K_RIGHT] or keys[pygame.K_d]))
 
-            self.player.update(self.screen, keys[pygame.K_UP])
 
             self.screen.blit(bg_surf, (0, 0))
             self.player.draw(self.screen)
 
+
+            self.player.update(self.screen)
+
+            if keys[pygame.K_UP] or keys[pygame.K_w]:
+                self.player.accelerate()
             pygame.display.update()
 
             self.clock.tick(60)
