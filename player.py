@@ -15,7 +15,16 @@ class Player:
         self.acceleration: float = 0.5
         self.max_velocity: float = 3
 
-        self.image: pygame.Surface = pygame.image.load("img/spaceship/placeholder.png").convert_alpha()
+        self.images: list[pygame.Surface] = []
+        self.images.append(pygame.image.load("img/spaceship/1.png"))
+        self.images.append(pygame.image.load("img/spaceship/2.png"))
+        self.images.append(pygame.image.load("img/spaceship/3.png"))
+        self.images.append(pygame.image.load("img/spaceship/4.png"))
+        self.images.append(pygame.image.load("img/spaceship/5.png"))
+        self.frame_index = 0
+        self.animation_speed: float = 0.3
+
+        self.image: pygame.Surface = self.images[self.frame_index]
 
         self.grabber: Grabber = Grabber(self.position)
 
@@ -28,6 +37,7 @@ class Player:
         screen.blit(rotated_image, rotated_rect.topleft)
 
     def update(self, screen: pygame.Surface) -> None:
+        self.animate()
         self.move()
         self.grabber.update(self.position)
 
@@ -46,3 +56,11 @@ class Player:
     def rotate(self, direction: float) -> None:
         self.direction += direction * self.rotation_speed
         self.direction %= 360
+
+    def animate(self):
+        self.frame_index += self.animation_speed
+
+        if self.frame_index >= len(self.images):
+            self.frame_index = 0
+
+        self.image = self.images[int(self.frame_index)]
