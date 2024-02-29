@@ -18,7 +18,7 @@ class Grabber:
         self.extension_speed: int = 5
         self.length: int = 0
 
-        self.image = pygame.image.load("img/grabber/placeholder3.png").convert_alpha()
+        self.image = pygame.image.load("img/grabber/placeholder.png").convert_alpha()
 
         self.max_length: int = self.image.get_height()
 

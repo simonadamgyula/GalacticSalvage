@@ -21,7 +21,7 @@ class Game:
 
         self.meteorite_spawn_rate: float = 0.5  # hány darab keletkezzen másodpercenként
         self.meteor_event: int = pygame.event.custom_type()
-        Meteorite.create_random()
+        Meteorite.create_random(self.screen_resolution)
 
     def run(self) -> None:
         bg_surf = self.background_generate()
@@ -37,7 +37,7 @@ class Game:
                     if pygame.mouse.get_pressed()[0]:
                         self.player.grabber.extend()
                 if event.type == self.meteor_event:
-                    Meteorite.create_random()
+                    Meteorite.create_random(self.screen_resolution)
 
             keys: pygame.key.ScancodeWrapper = pygame.key.get_pressed()
             self.player.rotate((keys[pygame.K_LEFT] or keys[pygame.K_a]) - (keys[pygame.K_RIGHT] or keys[pygame.K_d]))
