@@ -1,6 +1,8 @@
 import pygame
 import math
 
+from grabber import Grabber
+
 
 class Player:
     def __init__(self, x: int, y: int, direction: float) -> None:
@@ -32,29 +34,26 @@ class Player:
 
         self.moving = False
 
+        self.grabber: Grabber = Grabber(self.position)
+
     def draw(self, screen: pygame.Surface) -> None:
-        rotated_image: pygame.Surface = pygame.transform.rotate(
-            self.image, self.direction
-        )
-        rotated_rect: pygame.Rect = rotated_image.get_rect(
-            center=self.image.get_rect(center=self.position).center
-        )
+        self.grabber.draw(screen)
+
+        rotated_image: pygame.Surface = pygame.transform.rotate(self.image, self.direction)
+        rotated_rect: pygame.Rect = rotated_image.get_rect(center=self.image.get_rect(center=self.position).center)
 
         screen.blit(rotated_image, rotated_rect.topleft)
 
     def update(self, screen: pygame.Surface) -> None:
         self.animate()
         self.move()
-        self.draw(screen)
+        self.grabber.update(self.position)
 
     def accelerate(self) -> None:
-        acceleration: pygame.Vector2 = (
-            pygame.Vector2(
-                math.sin(math.radians(self.direction)),
-                math.cos(math.radians(self.direction)),
-            )
-            * self.acceleration
-        )
+        acceleration: pygame.Vector2 = pygame.Vector2(
+            math.sin(math.radians(self.direction)),
+            math.cos(math.radians(self.direction))
+        ) * self.acceleration
 
         self.velocity += acceleration
         self.velocity = self.velocity.clamp_magnitude(self.max_velocity)
