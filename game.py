@@ -2,6 +2,7 @@ import pygame
 from player import Player
 
 
+
 class Game:
 
     def __init__(self) -> None:
@@ -16,9 +17,13 @@ class Game:
         self.player: Player = Player(
             self.screen_resolution[0] // 2, self.screen_resolution[1] // 2, 0
         )
+        self.game_active: bool = False
+        self.game_font = pygame.font.Font("font/Beyonders-6YoJM.ttf")
 
     def run(self) -> None:
         bg_surf = self.background_generate()
+        title_surf = game_font.render
+
         running: bool = True
         while running:
             for event in pygame.event.get():
@@ -28,20 +33,24 @@ class Game:
                     if pygame.mouse.get_pressed()[0]:
                         self.player.grabber.extend()
 
-            keys: pygame.key.ScancodeWrapper = pygame.key.get_pressed()
-            self.player.rotate((keys[pygame.K_LEFT] or keys[pygame.K_a]) - (keys[pygame.K_RIGHT] or keys[pygame.K_d]))
+
+            if self.game_active:
+                keys: pygame.key.ScancodeWrapper = pygame.key.get_pressed()
+                self.player.rotate((keys[pygame.K_LEFT] or keys[pygame.K_a]) - (keys[pygame.K_RIGHT] or keys[pygame.K_d]))
 
 
-            self.screen.blit(bg_surf, (0, 0))
-            self.player.draw(self.screen)
+                self.screen.blit(bg_surf, (0, 0))
+                self.player.draw(self.screen)
 
 
-            self.player.update(self.screen)
+                self.player.update(self.screen)
 
-            if keys[pygame.K_UP] or keys[pygame.K_w]:
-                self.player.accelerate()
+                if keys[pygame.K_UP] or keys[pygame.K_w]:
+                    self.player.accelerate()
+
+            else:
+
             pygame.display.update()
-
             self.clock.tick(60)
 
         pygame.quit()
