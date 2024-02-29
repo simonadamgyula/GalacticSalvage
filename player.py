@@ -13,16 +13,24 @@ class Player:
         self.acceleration: float = 0.5
         self.max_velocity: float = 3
 
+        self.images_nmoving: list[pygame.Surface] = []
+        self.images_nmoving.append(pygame.image.load("img/spaceship/not_moving/1.png"))
+        self.images_nmoving.append(pygame.image.load("img/spaceship/not_moving/2.png"))
+
         self.images: list[pygame.Surface] = []
-        self.images.append(pygame.image.load("img/spaceship/1.png"))
-        self.images.append(pygame.image.load("img/spaceship/2.png"))
-        self.images.append(pygame.image.load("img/spaceship/3.png"))
-        self.images.append(pygame.image.load("img/spaceship/4.png"))
-        self.images.append(pygame.image.load("img/spaceship/5.png"))
+        self.images.append(pygame.image.load("img/spaceship/moving/1.png"))
+        self.images.append(pygame.image.load("img/spaceship/moving/2.png"))
+        self.images.append(pygame.image.load("img/spaceship/moving/3.png"))
+        self.images.append(pygame.image.load("img/spaceship/moving/4.png"))
+        self.images.append(pygame.image.load("img/spaceship/moving/5.png"))
+
         self.frame_index = 0
         self.animation_speed: float = 0.3
+        self.animation_speed_nmoving: float = 0.2
 
-        self.image: pygame.Surface = self.images[self.frame_index]
+        self.image: pygame.Surface = self.images_nmoving[self.frame_index]
+
+        self.moving = False
 
     def draw(self, screen: pygame.Surface) -> None:
         rotated_image: pygame.Surface = pygame.transform.rotate(
@@ -50,6 +58,7 @@ class Player:
 
         self.velocity += acceleration
         self.velocity = self.velocity.clamp_magnitude(self.max_velocity)
+        self.moving = True
 
     def move(self) -> None:
         self.position -= self.velocity
@@ -59,9 +68,17 @@ class Player:
         self.direction %= 360
 
     def animate(self):
-        self.frame_index += self.animation_speed
+        if self.moving == False:
+            self.frame_index += self.animation_speed_nmoving
+            if self.frame_index >= len(self.images_nmoving):
+                self.frame_index = 0
+            self.image = self.images_nmoving[int(self.frame_index)]
+        else:
+            self.frame_index += self.animation_speed
+            if self.frame_index >= len(self.images):
+                self.frame_index = 0
+            self.image = self.images[int(self.frame_index)]
 
-        if self.frame_index >= len(self.images):
-            self.frame_index = 0
+        self.moving = False
 
-        self.image = self.images[int(self.frame_index)]
+        
