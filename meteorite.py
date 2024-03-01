@@ -9,6 +9,7 @@ class Meteorite:
 
     def __init__(self, pos: pygame.Vector2, direction: float, speed: float, radius: int) -> None:
         self.position: pygame.Vector2 = pos
+        self.radius: int = radius - 40
         self.direction: float = direction
         self.velocity: float = speed
 
@@ -16,7 +17,7 @@ class Meteorite:
         self.rotation: float = 0
 
         self.image: pygame.Surface = pygame.image.load("./img/meteorite/placeholder.png").convert_alpha()
-        self.image = pygame.transform.scale(self.image, (radius, radius))
+        self.image = pygame.transform.scale(self.image, (radius * 2, radius * 2))
 
     def update(self) -> None:
         self.rotate()
@@ -40,7 +41,7 @@ class Meteorite:
 
     @staticmethod
     def create_random(screen_resolution: tuple[int, int]) -> None:
-        radius: int = random.randrange(100, 300)
+        radius: int = random.randrange(50, 150)
         position: pygame.Vector2 = Meteorite.generate_point_outside_screen(screen_resolution, radius)
         direction: float = Meteorite.create_random_direction(screen_resolution, position)
         speed: float = 1

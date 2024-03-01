@@ -47,10 +47,10 @@ class Game:
             pygame.display.update()
 
             self.screen.blit(bg_surf, (0, 0))
-            self.player.draw(self.screen)
             Meteorite.update_meteorites(self.screen)
 
-            self.player.update(self.screen)
+            self.player.update(Meteorite.meteorites)
+            self.player.draw(self.screen)
 
             self.clock.tick(60)
 
