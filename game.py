@@ -2,7 +2,6 @@ import pygame
 from player import Player
 
 
-
 class Game:
 
     def __init__(self) -> None:
@@ -18,11 +17,14 @@ class Game:
             self.screen_resolution[0] // 2, self.screen_resolution[1] // 2, 0
         )
         self.game_active: bool = False
-        self.game_font = pygame.font.Font("font/Beyonders-6YoJM.ttf")
+        self.game_font = pygame.font.Font("font/Beyonders-6YoJM.ttf", 80)
 
     def run(self) -> None:
         bg_surf = self.background_generate()
-        title_surf = game_font.render
+        title_surf: pygame.Surface = self.game_font.render(
+            "Galactic Salvage", True, "white"
+        )
+        title_rect = title_surf.get_rect(center=(800, 300))
 
         running: bool = True
         while running:
@@ -33,15 +35,15 @@ class Game:
                     if pygame.mouse.get_pressed()[0]:
                         self.player.grabber.extend()
 
-
             if self.game_active:
                 keys: pygame.key.ScancodeWrapper = pygame.key.get_pressed()
-                self.player.rotate((keys[pygame.K_LEFT] or keys[pygame.K_a]) - (keys[pygame.K_RIGHT] or keys[pygame.K_d]))
-
+                self.player.rotate(
+                    (keys[pygame.K_LEFT] or keys[pygame.K_a])
+                    - (keys[pygame.K_RIGHT] or keys[pygame.K_d])
+                )
 
                 self.screen.blit(bg_surf, (0, 0))
                 self.player.draw(self.screen)
-
 
                 self.player.update(self.screen)
 
@@ -49,7 +51,7 @@ class Game:
                     self.player.accelerate()
 
             else:
-
+                self.screen.blit(title_surf, title_rect)
             pygame.display.update()
             self.clock.tick(60)
 
