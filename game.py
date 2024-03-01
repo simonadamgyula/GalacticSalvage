@@ -1,3 +1,4 @@
+from pydoc import plain
 import pygame
 
 from meteorite import Meteorite
@@ -28,6 +29,10 @@ class Game:
         running: bool = True
 
         pygame.time.set_timer(self.meteor_event, int(1000 / self.meteorite_spawn_rate))
+        Font_color = (255,87,51)
+        game_font = pygame.font.Font(None, 200)
+        text_surf = game_font.render('DEFEAT', True, Font_color)
+        text_rect = text_surf.get_rect(center=(1600 / 2, 900 / 2))
 
         while running:
             for event in pygame.event.get():
@@ -49,6 +54,8 @@ class Game:
             self.screen.blit(bg_surf, (0, 0))
             self.player.draw(self.screen)
             Meteorite.update_meteorites(self.screen)
+            if self.player.dying:
+                self.screen.blit(text_surf, text_rect)
 
             self.player.update(self.screen)
 
