@@ -1,3 +1,4 @@
+from turtle import screensize
 import pygame
 from player import Player
 
@@ -30,6 +31,10 @@ class Game:
             "Nyomd meg a szóközt az indításhoz!", True, "white"
         )
         run_rect: pygame.Rect = run_surf.get_rect(center=(800, 470))
+        button_surf: pygame.Surface = pygame.Surface((150, 50))
+        button_rect: pygame.Rect = pygame.Rect(50, 50, 50, 50)
+        button_text: pygame.Surface = self.game_font.render("?", True, "white")
+        button_text_rect: pygame.Rect = button_text.get_rect(center=(button_surf.get_width()/2, button_surf.get_height()/2))
 
         running: bool = True
         while running:
@@ -62,6 +67,17 @@ class Game:
                 if keys[pygame.K_SPACE]:
                     self.game_active = True
 
+                if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                    if button_rect.collidepoint(pygame.mouse.get_pos()):
+                        pygame.draw.rect(button_surf, "blue", (1,1,100,50))
+                    else:
+                        pygame.draw.rect(button_surf, (0, 0, 0), (0, 0, 150, 50))
+                        pygame.draw.rect(button_surf, (255, 255, 255), (1, 1, 148, 48))
+                        pygame.draw.rect(button_surf, (0, 0, 0), (1, 1, 148, 1), 2)
+                        pygame.draw.rect(button_surf, (0, 100, 0), (1, 48, 148, 10), 2)
+
+            button_surf.blit(button_text, button_text_rect)
+            self.screen.blit(button_surf, (button_rect.x, button_rect.y))
             pygame.display.update()
             self.clock.tick(60)
 
