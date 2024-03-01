@@ -36,11 +36,17 @@ class Player:
 
         self.grabber: Grabber = Grabber(self.position)
 
+        self.dying = False
+
     def draw(self, screen: pygame.Surface) -> None:
         self.grabber.draw(screen)
 
-        rotated_image: pygame.Surface = pygame.transform.rotate(self.image, self.direction)
-        rotated_rect: pygame.Rect = rotated_image.get_rect(center=self.image.get_rect(center=self.position).center)
+        rotated_image: pygame.Surface = pygame.transform.rotate(
+            self.image, self.direction
+        )
+        rotated_rect: pygame.Rect = rotated_image.get_rect(
+            center=self.image.get_rect(center=self.position).center
+        )
 
         screen.blit(rotated_image, rotated_rect.topleft)
 
@@ -48,13 +54,18 @@ class Player:
         self.animate()
         self.move()
         self.grabber.update(self.position)
+        self.out_screen()
 
     def accelerate(self) -> None:
-        acceleration: pygame.Vector2 = pygame.Vector2(
-            math.sin(math.radians(self.direction)),
-            math.cos(math.radians(self.direction))
-        ) * self.acceleration
-
+        acceleration: pygame.Vector2 = (
+            pygame.Vector2(
+                math.sin(math.radians(self.direction)),
+                math.cos(math.radians(self.direction)),
+            )
+            * self.acceleration
+        )
+        if self.dying:
+            self.acceleration = 0
         self.velocity += acceleration
         self.velocity = self.velocity.clamp_magnitude(self.max_velocity)
         self.moving = True
@@ -67,7 +78,7 @@ class Player:
         self.direction %= 360
 
     def animate(self):
-        if self.moving == False:
+        if not self.moving:
             self.frame_index += self.animation_speed_nmoving
             if self.frame_index >= len(self.images_nmoving):
                 self.frame_index = 0
@@ -80,4 +91,13 @@ class Player:
 
         self.moving = False
 
-        
+    def out_screen(self):
+        if (
+            self.position.x > 1600
+            or self.position.x < 0
+            or self.position.y > 900
+            or self.position.y < 0
+        ):
+            self.dying = True
+        else:
+            self.dying = False
