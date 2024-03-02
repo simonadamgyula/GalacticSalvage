@@ -54,7 +54,6 @@ class Game:
             self.screen.blit(bg_surf, (0, 0))
 
             Meteorite.meteorites.update(screen=self.screen)
-            self.player.draw(self.screen)
             if self.player.dying:
                 self.screen.blit(text_surf, text_rect)
 
