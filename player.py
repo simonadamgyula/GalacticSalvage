@@ -38,7 +38,7 @@ class Player:
     def resolution(self) -> tuple[int, int]:
         return self.image.get_width(), self.image.get_height()
 
-    def draw(self, screen: pygame.Surface) -> None:
+    def draw(self, screen: pygame.Surface, collision: bool) -> None:
         self.grabber.draw(screen)
 
         rotated_image: pygame.Surface = pygame.transform.rotate(self.image, self.direction)
@@ -46,17 +46,19 @@ class Player:
 
         screen.blit(rotated_image, self.rotated_rect.topleft)
 
-    def update(self, meteorites: list[Meteorite]) -> bool:
+        if not collision:
+            return
+
+        pygame.draw.circle(screen, "red", self.position,
+                           math.sqrt((self.image.get_width() / 2) ** 2 + (self.image.get_height() / 2) ** 2), 1)
+
+    def update(self) -> None:
         self.animate()
         self.move()
         self.grabber.update(self.position)
-        return self.check_collision(meteorites)
 
     def accelerate(self) -> None:
-        acceleration: pygame.Vector2 = pygame.Vector2(
-            math.sin(math.radians(self.direction)),
-            math.cos(math.radians(self.direction))
-        ) * self.acceleration
+        acceleration: pygame.Vector2 = pygame.Vector2(0, 1).rotate(-self.direction) * self.acceleration
 
         self.velocity += acceleration
         self.velocity = self.velocity.clamp_magnitude(self.max_velocity)
@@ -76,16 +78,13 @@ class Player:
 
         self.image = self.images[int(self.frame_index)]
 
+    def get_verticies(self) -> list[pygame.Vector2]:
+        pass
+
     def check_collision(self, meteorites: list[Meteorite]) -> bool:
         for meteorite in meteorites:
-            closest_x = clamp(meteorite.position.x, self.rotated_rect.left, self.rotated_rect.right)
-            closest_y = clamp(meteorite.position.y, self.rotated_rect.top, self.rotated_rect.bottom)
-
-            distance_x: float = meteorite.position.x - closest_x
-            distance_y: float = meteorite.position.y - closest_y
-
-            distance_squared: float = distance_x ** 2 + distance_y ** 2
-            if distance_squared < meteorite.radius ** 2:
+            if (meteorite.radius + math.sqrt((self.image.get_width() / 2) ** 2 + (self.image.get_height() / 2) ** 2) >
+                    (self.position - meteorite.position).magnitude()):
                 return True
 
         return False

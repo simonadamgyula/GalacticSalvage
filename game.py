@@ -49,8 +49,9 @@ class Game:
             self.screen.blit(bg_surf, (0, 0))
             Meteorite.update_meteorites(self.screen)
 
-            self.player.update(Meteorite.meteorites)
-            self.player.draw(self.screen)
+            self.player.update()
+            collision: bool = self.player.check_collision(Meteorite.meteorites)
+            self.player.draw(self.screen, collision)
 
             self.clock.tick(60)
 

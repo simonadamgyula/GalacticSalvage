@@ -24,10 +24,7 @@ class Meteorite:
         self.move()
 
     def move(self) -> None:
-        self.position += pygame.Vector2(
-            math.sin(math.radians(self.direction)),
-            math.cos(math.radians(self.direction))
-        ) * self.velocity
+        self.position += pygame.Vector2(0, 1).rotate(-self.direction) * self.velocity
 
     def rotate(self) -> None:
         self.rotation += self.rotation_speed
@@ -38,6 +35,7 @@ class Meteorite:
         rotated_rect: pygame.Rect = rotated_image.get_rect(center=self.image.get_rect(center=self.position).center)
 
         screen.blit(rotated_image, rotated_rect.topleft)
+        # pygame.draw.circle(screen, "yellow", self.position, self.radius)
 
     @staticmethod
     def create_random(screen_resolution: tuple[int, int]) -> None:
@@ -82,8 +80,8 @@ class Meteorite:
                 position.x = 0
                 position.y = bounding_height - (p - bounding_width)
 
-        position.x += 50 - meteorite_width
-        position.y += 50 - meteorite_width
+        position.x -= meteorite_width
+        position.y -= meteorite_width
 
         return position
 
