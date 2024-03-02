@@ -3,6 +3,7 @@ import math
 
 from grabber import Grabber
 from meteorite import Meteorite
+from collision import Collision
 
 
 def clamp(value: float, min_: float, max_: float) -> float:
@@ -79,12 +80,27 @@ class Player:
         self.image = self.images[int(self.frame_index)]
 
     def get_verticies(self) -> list[pygame.Vector2]:
-        pass
+        width: int = self.image.get_width()
+        height: int = self.image.get_height()
+
+        verticies: list[pygame.Vector2] = []
+        for i in range(4):
+            binary: str = format(i, 'b').zfill(2)
+            verticies.append(pygame.Vector2((width / 2) * (1 if binary[0] == '0' else -1),
+                                            (height / 2) * (1 if binary[1] == '0' else -1))
+                             .rotate(-self.direction) + self.position)
+
+        verticies[-1], verticies[-2] = verticies[-2], verticies[-1]
+        return verticies
 
     def check_collision(self, meteorites: list[Meteorite]) -> bool:
+        verticies: list[pygame.Vector2] = self.get_verticies()
         for meteorite in meteorites:
-            if (meteorite.radius + math.sqrt((self.image.get_width() / 2) ** 2 + (self.image.get_height() / 2) ** 2) >
+            if (meteorite.radius + math.sqrt((self.image.get_width() / 2) ** 2 + (self.image.get_height() / 2) ** 2) <
                     (self.position - meteorite.position).magnitude()):
+                continue
+
+            if Collision.rectangle_circle_collision(self.position, verticies, meteorite.position, meteorite.radius):
                 return True
 
         return False

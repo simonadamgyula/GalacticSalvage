@@ -7,14 +7,17 @@ class Collision:
                                    circle_center: pygame.Vector2, radius: float) -> bool:
         closest_point: pygame.Vector2 = Collision.intersection_of_segment_rect(verticies,
                                                                                (rect_center, circle_center))
-        return closest_point - circle_center < radius
+
+        if not closest_point:
+            return True
+        return (closest_point - circle_center).magnitude() < radius
 
     @staticmethod
     def intersection_of_segment_rect(verticies: list[pygame.Vector2], segment: tuple[pygame.Vector2, pygame.Vector2]) \
             -> pygame.Vector2:
         for i in range(len(verticies)):
-            intersection: None | pygame.Vector2 = Collision.intersection_of_linesegments(segment,
-                                                                                         (verticies[i], segment[i - 1]))
+            intersection: None | pygame.Vector2 = \
+                Collision.intersection_of_linesegments(segment, (verticies[i], verticies[i - 1]))
             if intersection:
                 return intersection
 
@@ -26,15 +29,15 @@ class Collision:
         x3, y3 = segment2[0]
         x4, y4 = segment2[1]
 
-        a: float = (x1 - x3) * (y3 - y4) - (y1 - y3) * (x3 - y4)
-        b: float = (x1 - x2) * (y1 - y2) - (y1 - y2) * (x1 - x3)
+        a: float = (x1 - x3) * (y3 - y4) - (y1 - y3) * (x3 - x4)
+        b: float = (x1 - x2) * (y1 - y3) - (y1 - y2) * (x1 - x3)
         c: float = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4)
 
         if c == 0:
             return
 
         t: float = a / c
-        u: float = b / c
+        u: float = -b / c
 
         if t < 0 or t > 1 or u < 0 or u > 1:
             return
