@@ -52,12 +52,15 @@ class Game:
             pygame.display.update()
 
             self.screen.blit(bg_surf, (0, 0))
+
+            Meteorite.meteorites.update(screen=self.screen)
             self.player.draw(self.screen)
-            Meteorite.update_meteorites(self.screen)
             if self.player.dying:
                 self.screen.blit(text_surf, text_rect)
 
-            self.player.update(self.screen)
+            self.player.update()
+            collision: bool = self.player.check_collision(Meteorite.meteorites.sprites())
+            self.player.draw(self.screen, collision)
 
             self.clock.tick(60)
 

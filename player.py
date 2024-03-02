@@ -2,6 +2,12 @@ import pygame
 import math
 
 from grabber import Grabber
+from meteorite import Meteorite
+from collision import Collision
+
+
+def clamp(value: float, min_: float, max_: float) -> float:
+    return max(min(value, max_), min_)
 
 
 class Player:
@@ -37,6 +43,10 @@ class Player:
         self.grabber: Grabber = Grabber(self.position)
 
         self.dying = False
+        
+    property
+    def resolution(self) -> tuple[int, int]:
+        return self.image.get_width(), self.image.get_height()
 
     def draw(self, screen: pygame.Surface) -> None:
         self.grabber.draw(screen)
@@ -48,24 +58,26 @@ class Player:
             center=self.image.get_rect(center=self.position).center
         )
 
-        screen.blit(rotated_image, rotated_rect.topleft)
+        screen.blit(rotated_image, self.rotated_rect.topleft)
 
-    def update(self, screen: pygame.Surface) -> None:
+        if not collision:
+            return
+
+        pygame.draw.circle(screen, "red", self.position,
+                           math.sqrt((self.image.get_width() / 2) ** 2 + (self.image.get_height() / 2) ** 2), 1)
+
+    def update(self) -> None:
         self.animate()
         self.move()
         self.grabber.update(self.position)
         self.out_screen()
 
     def accelerate(self) -> None:
-        acceleration: pygame.Vector2 = (
-            pygame.Vector2(
-                math.sin(math.radians(self.direction)),
-                math.cos(math.radians(self.direction)),
-            )
-            * self.acceleration
-        )
+        acceleration: pygame.Vector2 = pygame.Vector2(0, 1).rotate(-self.direction) * self.acceleration
+
         if self.dying:
             self.acceleration = 0
+        
         self.velocity += acceleration
         self.velocity = self.velocity.clamp_magnitude(self.max_velocity)
         self.moving = True
@@ -90,6 +102,32 @@ class Player:
             self.image = self.images[int(self.frame_index)]
 
         self.moving = False
+        
+    def get_verticies(self) -> list[pygame.Vector2]:
+        width: int = self.image.get_width()
+        height: int = self.image.get_height()
+
+        verticies: list[pygame.Vector2] = []
+        for i in range(4):
+            binary: str = format(i, 'b').zfill(2)
+            verticies.append(pygame.Vector2((width / 2) * (1 if binary[0] == '0' else -1),
+                                            (height / 2) * (1 if binary[1] == '0' else -1))
+                             .rotate(-self.direction) + self.position)
+
+        verticies[-1], verticies[-2] = verticies[-2], verticies[-1]
+        return verticies
+
+    def check_collision(self, meteorites: list[Meteorite]) -> bool:
+        verticies: list[pygame.Vector2] = self.get_verticies()
+        for meteorite in meteorites:
+            if (meteorite.radius + math.sqrt((self.image.get_width() / 2) ** 2 + (self.image.get_height() / 2) ** 2) <
+                    (self.position - meteorite.position).magnitude()):
+                continue
+
+            if Collision.rectangle_circle_collision(self.position, verticies, meteorite.position, meteorite.radius):
+                return True
+
+        return False
 
     def out_screen(self):
         if (
