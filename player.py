@@ -44,11 +44,11 @@ class Player:
 
         self.dying = False
         
-    property
+    @property
     def resolution(self) -> tuple[int, int]:
         return self.image.get_width(), self.image.get_height()
 
-    def draw(self, screen: pygame.Surface) -> None:
+    def draw(self, screen: pygame.Surface, collision: bool) -> None:
         self.grabber.draw(screen)
 
         rotated_image: pygame.Surface = pygame.transform.rotate(
@@ -58,7 +58,7 @@ class Player:
             center=self.image.get_rect(center=self.position).center
         )
 
-        screen.blit(rotated_image, self.rotated_rect.topleft)
+        screen.blit(rotated_image, rotated_rect)
 
         if not collision:
             return
