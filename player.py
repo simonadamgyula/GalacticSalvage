@@ -1,9 +1,11 @@
 import pygame
 import math
 
+from animation import Animation
 from grabber import Grabber
 from meteorite import Meteorite
 from collision import Collision
+from animation import Animation
 
 
 def clamp(value: float, min_: float, max_: float) -> float:
@@ -32,6 +34,8 @@ class Player:
         self.images.append(pygame.image.load("img/spaceship/moving/4.png"))
         self.images.append(pygame.image.load("img/spaceship/moving/5.png"))
 
+        self.death_animation: Animation = Animation.import_spritesheet("img/explosion.png", 224, 224, 0.2,  False)
+
         self.frame_index = 0
         self.animation_speed: float = 0.3
         self.animation_speed_nmoving: float = 0.2
@@ -42,13 +46,17 @@ class Player:
 
         self.grabber: Grabber = Grabber(self.position)
 
-        self.dying = False
+        self.dead = False
         
     @property
     def resolution(self) -> tuple[int, int]:
         return self.image.get_width(), self.image.get_height()
 
-    def draw(self, screen: pygame.Surface, collision: bool) -> None:
+    def draw(self, screen: pygame.Surface) -> None:
+        if self.dead:
+            self.death_animation.draw_next(screen, self.position)
+            return
+
         self.grabber.draw(screen)
 
         rotated_image: pygame.Surface = pygame.transform.rotate(
@@ -60,12 +68,6 @@ class Player:
 
         screen.blit(rotated_image, rotated_rect)
 
-        if not collision:
-            return
-
-        pygame.draw.circle(screen, "red", self.position,
-                           math.sqrt((self.image.get_width() / 2) ** 2 + (self.image.get_height() / 2) ** 2), 1)
-
     def update(self) -> None:
         self.animate()
         self.move()
@@ -74,15 +76,14 @@ class Player:
 
     def accelerate(self) -> None:
         acceleration: pygame.Vector2 = pygame.Vector2(0, 1).rotate(-self.direction) * self.acceleration
-
-        if self.dying:
-            self.acceleration = 0
         
         self.velocity += acceleration
         self.velocity = self.velocity.clamp_magnitude(self.max_velocity)
         self.moving = True
 
     def move(self) -> None:
+        if self.dead:
+            return
         self.position -= self.velocity
 
     def rotate(self, direction: float) -> None:
@@ -129,13 +130,12 @@ class Player:
 
         return False
 
-    def out_screen(self):
+    def out_screen(self) -> None:
         if (
-            self.position.x > 1600
-            or self.position.x < 0
-            or self.position.y > 900
-            or self.position.y < 0
+            self.position.x > 1600 or self.position.x < 0 or
+            self.position.y > 900 or self.position.y < 0
         ):
-            self.dying = True
-        else:
-            self.dying = False
+            self.die()
+
+    def die(self) -> None:
+        self.dead = True
