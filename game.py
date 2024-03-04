@@ -1,4 +1,3 @@
-from pydoc import plain
 import pygame
 
 from meteorite import Meteorite
