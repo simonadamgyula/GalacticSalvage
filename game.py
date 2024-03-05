@@ -1,4 +1,3 @@
-from pydoc import plain
 import pygame
 
 from meteorite import Meteorite
@@ -54,12 +53,14 @@ class Game:
             self.screen.blit(bg_surf, (0, 0))
 
             Meteorite.meteorites.update(screen=self.screen)
-            if self.player.dying:
+            if self.player.dead:
                 self.screen.blit(text_surf, text_rect)
 
             self.player.update()
             collision: bool = self.player.check_collision(Meteorite.meteorites.sprites())
-            self.player.draw(self.screen, collision)
+            if collision:
+                self.player.die()
+            self.player.draw(self.screen)
 
             self.clock.tick(60)
 
