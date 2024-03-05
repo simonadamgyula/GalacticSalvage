@@ -2,6 +2,7 @@ import pygame
 
 from meteorite import Meteorite
 from player import Player
+from debris import Debris
 
 
 class Game:
@@ -20,14 +21,19 @@ class Game:
         )
 
         self.meteorite_spawn_rate: float = 0.5  # hány darab keletkezzen másodpercenként
-        self.meteor_event: int = pygame.event.custom_type()
+        self.meteor_spawn_event: int = pygame.event.custom_type()
         Meteorite.create_random(self.screen_resolution)
+
+        self.debris_spawn_rate: float = 0.2
+        self.debris_spawn_event: int = pygame.event.custom_type()
+        Debris.create_random(self.screen_resolution)
 
     def run(self) -> None:
         bg_surf = self.background_generate()
         running: bool = True
 
-        pygame.time.set_timer(self.meteor_event, int(1000 / self.meteorite_spawn_rate))
+        pygame.time.set_timer(self.meteor_spawn_event, int(1000 / self.meteorite_spawn_rate))
+        pygame.time.set_timer(self.debris_spawn_event, int(1000 / self.debris_spawn_rate))
         Font_color = (255,87,51)
         game_font = pygame.font.Font(None, 200)
         text_surf = game_font.render('DEFEAT', True, Font_color)
@@ -40,27 +46,33 @@ class Game:
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if pygame.mouse.get_pressed()[0]:
                         self.player.grabber.extend()
-                if event.type == self.meteor_event:
+                if event.type == self.meteor_spawn_event:
                     Meteorite.create_random(self.screen_resolution)
+                if event.type == self.debris_spawn_event:
+                    Debris.create_random(self.screen_resolution)
 
             keys: pygame.key.ScancodeWrapper = pygame.key.get_pressed()
             self.player.rotate((keys[pygame.K_LEFT] or keys[pygame.K_a]) - (keys[pygame.K_RIGHT] or keys[pygame.K_d]))
 
             if keys[pygame.K_UP] or keys[pygame.K_w]:
                 self.player.accelerate()
-            pygame.display.update()
 
             self.screen.blit(bg_surf, (0, 0))
 
             Meteorite.meteorites.update(screen=self.screen)
+            Debris.debris_group.update(screen=self.screen)
+
             if self.player.dead:
                 self.screen.blit(text_surf, text_rect)
 
             self.player.update()
+            self.player.grabber.check_collect(Debris.debris_group.sprites(), screen=self.screen)
             collision: bool = self.player.check_collision(Meteorite.meteorites.sprites())
             if collision:
                 self.player.die()
             self.player.draw(self.screen)
+
+            pygame.display.update()
 
             self.clock.tick(60)
 

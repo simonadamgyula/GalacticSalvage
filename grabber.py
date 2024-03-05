@@ -2,6 +2,9 @@ import math
 import pygame
 from enum import Enum
 
+from collision import Collision
+from debris import Debris
+
 
 class ExtensionStage(Enum):
     STOPPED: int = 0
@@ -52,6 +55,17 @@ class Grabber:
             self.length = self.max_length
             self.extension_stage = ExtensionStage.RETRACTING
 
+    def check_collect(self, debris_list: list[Debris], screen) -> None:
+        if self.extension_stage == ExtensionStage.STOPPED:
+            return
+
+        hitbox_position: pygame.Vector2 = self.get_hitbox()
+        pygame.draw.circle(screen, "green", hitbox_position, 20, 1)
+
+        for debris in debris_list:
+            if Collision.circle_circle_collision(hitbox_position, 20, debris.position, 10):
+                debris.kill()
+
     def rotate(self) -> None:
         mouse_pos: tuple[int, int] = pygame.mouse.get_pos()
         mouse_vec: pygame.Vector2 = pygame.Vector2(mouse_pos[0] - self.position.x, mouse_pos[1] - self.position.y)
@@ -63,6 +77,9 @@ class Grabber:
         rotated_image, rotated_image_rect = self.get_rotated_image(chopped_image)
 
         screen.blit(rotated_image, rotated_image_rect)
+
+    def get_hitbox(self) -> pygame.Vector2:
+        return pygame.Vector2(0, self.length).rotate(-self.direction) + self.position
 
     def chop_image(self, height: int) -> pygame.Surface:
         chop_rect: pygame.Rect = pygame.Rect(0, height, self.image.get_width(), self.image.get_height() - height)
