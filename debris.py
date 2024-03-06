@@ -2,6 +2,8 @@ import pygame
 import random
 import math
 
+from meteorite import Meteorite
+
 
 class Debris(pygame.sprite.Sprite):
     debris_group: pygame.sprite.Group = pygame.sprite.Group()
@@ -42,44 +44,8 @@ class Debris(pygame.sprite.Sprite):
 
     @staticmethod
     def create_random(screen_resolution: tuple[int, int]) -> None:
-        position: pygame.Vector2 = Debris.generate_point_outside_screen(screen_resolution)
-        direction: float = Debris.create_random_direction(screen_resolution, position)
+        position: pygame.Vector2 = Meteorite.generate_point_outside_screen(screen_resolution, 10)
+        direction: float = Meteorite.create_random_direction(screen_resolution, position)
         speed: float = random.random() * 2 + 1
 
         Debris.debris_group.add(Debris(position, direction, speed))
-
-    @staticmethod
-    def create_random_direction(screen_resolution: tuple[int, int], position: pygame.Vector2) -> float:
-        point: pygame.Vector2 = pygame.Vector2(random.randint(50, screen_resolution[0] - 50),
-                                               random.randint(50, screen_resolution[1] - 50))
-
-        return math.degrees(math.atan2(point.x - position.x, point.y - position.y))
-
-    @staticmethod
-    def generate_point_outside_screen(screen_resolution: tuple[int, int]):
-        bounding_width: int = screen_resolution[0] + 20
-        bounding_height: int = screen_resolution[1] + 20
-
-        position: pygame.Vector2 = pygame.Vector2(0, 0)
-
-        p = random.randint(0, (bounding_width + bounding_height) * 2)
-        if p < (bounding_width + bounding_height):
-            if p < bounding_width:
-                position.x = p
-                position.y = 0
-            else:
-                position.x = bounding_width
-                position.y = p - bounding_width
-        else:
-            p = p - (bounding_width + bounding_height)
-            if p < bounding_width:
-                position.x = bounding_width - p
-                position.y = bounding_height
-            else:
-                position.x = 0
-                position.y = bounding_height - (p - bounding_width)
-
-        position.x -= 10
-        position.y -= 10
-
-        return position
