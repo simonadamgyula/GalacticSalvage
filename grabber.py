@@ -25,6 +25,8 @@ class Grabber:
 
         self.max_length: int = self.image.get_height()
 
+        self.caught_debris: list[Debris] = []
+
     def extend(self) -> None:
         if self.extension_stage != ExtensionStage.STOPPED:
             return
@@ -36,8 +38,25 @@ class Grabber:
         self.move(position)
         self.extension()
 
+        self.drag_debris()
+        if self.length == 0:
+            self.collect_debris()
+
     def move(self, position: pygame.Vector2) -> None:
         self.position = position
+
+    def drag_debris(self) -> None:
+        if len(self.caught_debris) == 0:
+            return
+
+        end_position: pygame.Vector2 = self.get_hitbox_position()
+        for debris in self.caught_debris:
+            debris.snap(end_position)
+
+    def collect_debris(self) -> None:
+        for debris in self.caught_debris:
+            debris.kill()
+        self.caught_debris = []
 
     def extension(self) -> None:
         if self.extension_stage == ExtensionStage.STOPPED:
@@ -59,12 +78,13 @@ class Grabber:
         if self.extension_stage == ExtensionStage.STOPPED:
             return
 
-        hitbox_position: pygame.Vector2 = self.get_hitbox()
+        hitbox_position: pygame.Vector2 = self.get_hitbox_position()
         pygame.draw.circle(screen, "green", hitbox_position, 20, 1)
 
         for debris in debris_list:
             if Collision.circle_circle_collision(hitbox_position, 20, debris.position, 10):
-                debris.kill()
+                self.caught_debris.append(debris)
+                debris.caught = True
 
     def rotate(self) -> None:
         mouse_pos: tuple[int, int] = pygame.mouse.get_pos()
@@ -78,7 +98,7 @@ class Grabber:
 
         screen.blit(rotated_image, rotated_image_rect)
 
-    def get_hitbox(self) -> pygame.Vector2:
+    def get_hitbox_position(self) -> pygame.Vector2:
         return pygame.Vector2(0, self.length).rotate(-self.direction) + self.position
 
     def chop_image(self, height: int) -> pygame.Surface:
