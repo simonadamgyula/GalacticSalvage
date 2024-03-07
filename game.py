@@ -58,7 +58,8 @@ class Game:
                 self.player.accelerate()
 
             self.screen.blit(bg_surf, (0, 0))
-
+            text_points = game_font.render(f"{self.player.grabber.points}", 1, Font_color)
+            self.screen.blit(text_points,(20,20))
             Meteorite.meteorites.update(screen=self.screen)
             Debris.debris_group.update(screen=self.screen)
 
