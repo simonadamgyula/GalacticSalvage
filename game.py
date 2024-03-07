@@ -1,5 +1,8 @@
 import pygame
+
+from meteorite import Meteorite
 from player import Player
+from debris import Debris
 
 
 class Game:
@@ -20,6 +23,14 @@ class Game:
         self.game_font = pygame.font.Font("font/Beyonders-6YoJM.ttf", 80)
         self.game_font_smaller = pygame.font.Font("font/Beyonders-6YoJM.ttf", 40)
         self.other_font = pygame.font.Font("font/ninifont-caps.otf", 50)
+
+        self.meteorite_spawn_rate: float = 0.5  # hány darab keletkezzen másodpercenként
+        self.meteor_spawn_event: int = pygame.event.custom_type()
+        Meteorite.create_random(self.screen_resolution)
+
+        self.debris_spawn_rate: float = 0.2
+        self.debris_spawn_event: int = pygame.event.custom_type()
+        Debris.create_random(self.screen_resolution)
 
     def run(self) -> None:
         bg_surf: pygame.Surface = self.background_generate()
@@ -42,35 +53,55 @@ class Game:
 
 
         running: bool = True
+
+        pygame.time.set_timer(self.meteor_spawn_event, int(1000 / self.meteorite_spawn_rate))
+        pygame.time.set_timer(self.debris_spawn_event, int(1000 / self.debris_spawn_rate))
+        Font_color = (255,87,51)
+        game_font = pygame.font.Font(None, 200)
+        text_surf = game_font.render('DEFEAT', True, Font_color)
+        text_rect = text_surf.get_rect(center=(1600 / 2, 900 / 2))
+
         while running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
                 if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                    print(pygame.mouse.get_pos(), button_rect)
+                    self.player.grabber.extend()
                     if button_rect.collidepoint(pygame.mouse.get_pos()):
                         screen_note = not screen_note
                         
                     else:
                         pygame.draw.rect(button_surf, (0,0,0), (0, 0, 200, 200))
+                if event.type == self.meteor_spawn_event:
+                    Meteorite.create_random(self.screen_resolution)
+                if event.type == self.debris_spawn_event:
+                    Debris.create_random(self.screen_resolution)
                 # if event.type == pygame.MOUSEBUTTONDOWN:
                 #     if pygame.mouse.get_pressed()[0]: 
                 #         self.player.grabber.extend()
 
             keys: pygame.key.ScancodeWrapper = pygame.key.get_pressed()
             if self.game_active:
-                self.player.rotate(
-                    (keys[pygame.K_LEFT] or keys[pygame.K_a])
-                    - (keys[pygame.K_RIGHT] or keys[pygame.K_d])
-                )
-
-                self.screen.blit(bg_surf, (0, 0))
-                self.player.draw(self.screen)
-
-                self.player.update(self.screen)
+                self.player.rotate((keys[pygame.K_LEFT] or keys[pygame.K_a]) - (keys[pygame.K_RIGHT] or keys[pygame.K_d]))
 
                 if keys[pygame.K_UP] or keys[pygame.K_w]:
                     self.player.accelerate()
+
+                self.screen.blit(bg_surf, (0, 0))
+                text_points = game_font.render(f"{self.player.grabber.points}", 1, Font_color)
+                self.screen.blit(text_points,(20,20))
+                Meteorite.meteorites.update(screen=self.screen)
+                Debris.debris_group.update(screen=self.screen)
+
+                if self.player.dead:
+                    self.screen.blit(text_surf, text_rect)
+
+                self.player.update()
+                self.player.grabber.check_collect(Debris.debris_group.sprites(), screen=self.screen)
+                collision: bool = self.player.check_collision(Meteorite.meteorites.sprites())
+                if collision:
+                    self.player.die()
+                self.player.draw(self.screen)
 
             else:
                 self.screen.fill("green")
@@ -90,6 +121,7 @@ class Game:
 
         pygame.quit()
 
-    def background_generate(self):
+    @staticmethod
+    def background_generate():
         bg_surf = pygame.image.load("img/background/space.png").convert_alpha()
         return bg_surf
