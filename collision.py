@@ -3,6 +3,11 @@ import pygame
 
 class Collision:
     @staticmethod
+    def circle_circle_collision(circle1_center: pygame.Vector2, circle1_radius: float,
+                                circle2_center: pygame.Vector2, circle2_radius: float) -> bool:
+        return circle1_center.distance_to(circle2_center) < circle1_radius + circle2_radius
+
+    @staticmethod
     def rectangle_circle_collision(rect_center: pygame.Vector2, verticies: list[pygame.Vector2],
                                    circle_center: pygame.Vector2, radius: float) -> bool:
         closest_point: pygame.Vector2 = Collision.intersection_of_segment_rect(verticies,
@@ -10,7 +15,7 @@ class Collision:
 
         if not closest_point:
             return True
-        return (closest_point - circle_center).magnitude() < radius
+        return closest_point.distance_to(circle_center) < radius
 
     @staticmethod
     def intersection_of_segment_rect(verticies: list[pygame.Vector2], segment: tuple[pygame.Vector2, pygame.Vector2]) \

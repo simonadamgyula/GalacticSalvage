@@ -2,6 +2,7 @@ import pygame
 import math
 
 from animation import Animation
+from debris import Debris
 from grabber import Grabber
 from meteorite import Meteorite
 from collision import Collision
