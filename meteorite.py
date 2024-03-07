@@ -19,7 +19,7 @@ class Meteorite(pygame.sprite.Sprite):
         self.rotation_speed: float = 0.1
         self.rotation: float = 0
 
-        self.image: pygame.Surface = pygame.image.load("./img/meteorite/placeholder.png").convert_alpha()
+        self.image: pygame.Surface = pygame.image.load("img/meteorite/meteorite.png").convert_alpha()
         self.image = pygame.transform.scale(self.image, (radius * 2, radius * 2))
 
     def update(self, *args, **kwargs) -> None:

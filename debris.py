@@ -1,6 +1,5 @@
 import pygame
 import random
-import math
 
 from meteorite import Meteorite
 
@@ -15,8 +14,10 @@ class Debris(pygame.sprite.Sprite):
         self.direction: float = direction
         self.velocity: float = speed
 
-        self.rotation_speed: float = 0.1
+        self.rotation_speed: float = 0.5
         self.rotation: float = 0
+
+        self.image: pygame.Surface = pygame.image.load("./img/debris/satellite.png")
 
         self.caught: bool = False
 
@@ -32,11 +33,14 @@ class Debris(pygame.sprite.Sprite):
         self.draw(screen)
 
     def draw(self, screen: pygame.Surface) -> None:
-        # not permanent, just for testing
-        pygame.draw.circle(screen, "yellow", self.position, 20)
+        rotated_image: pygame.Surface = pygame.transform.rotate(self.image, self.rotation)
+        rotated_rect: pygame.Rect = rotated_image.get_rect(center=self.image.get_rect(center=self.position).center)
+
+        screen.blit(rotated_image, rotated_rect.topleft)
 
     def rotate(self) -> None:
         self.rotation += self.rotation_speed
+        self.rotation %= 360
 
     def move(self) -> None:
         self.position += pygame.Vector2(0, 1).rotate(-self.direction) * self.velocity
