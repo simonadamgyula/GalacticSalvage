@@ -79,7 +79,6 @@ class Grabber:
             return
 
         hitbox_position: pygame.Vector2 = self.get_hitbox_position()
-        pygame.draw.circle(screen, "green", hitbox_position, 20, 1)
 
         for debris in debris_list:
             if Collision.circle_circle_collision(hitbox_position, 20, debris.position, 10):
