@@ -22,8 +22,6 @@ class Meteorite(pygame.sprite.Sprite):
         self.image: pygame.Surface = pygame.image.load("./img/meteorite/placeholder.png").convert_alpha()
         self.image = pygame.transform.scale(self.image, (radius * 2, radius * 2))
 
-        self.debug: list[pygame.Vector2] = []
-
     def update(self, *args, **kwargs) -> None:
         screen: pygame.Surface = kwargs["screen"]
 
@@ -40,7 +38,6 @@ class Meteorite(pygame.sprite.Sprite):
 
     def move(self) -> None:
         self.position += pygame.Vector2(0, self.velocity).rotate(-self.direction)
-        self.debug.append(copy.copy(self.position))
 
     def rotate(self) -> None:
         self.rotation += self.rotation_speed
@@ -51,9 +48,6 @@ class Meteorite(pygame.sprite.Sprite):
         rotated_rect: pygame.Rect = rotated_image.get_rect(center=self.image.get_rect(center=self.position).center)
 
         screen.blit(rotated_image, rotated_rect.topleft)
-
-        for i in self.debug:
-            pygame.draw.circle(screen, "red", i, 2)
 
     @staticmethod
     def create_random(screen_resolution: tuple[int, int]) -> None:
