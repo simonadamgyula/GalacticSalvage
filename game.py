@@ -34,17 +34,12 @@ class Game:
 
         # button properties
         button_surf: pygame.Surface = pygame.Surface((100, 100))
-        button_surf.fill("white")
-        button_rect: pygame.Rect = pygame.Rect(50, 50, 50, 50)
-        button_text: pygame.Surface = self.game_font_smaller.render("?", True, "red", "white")
+        # button_surf.fill("black")
+        button_rect: pygame.Rect = pygame.Rect(50, 50, 100, 100)
+        button_text: pygame.Surface = self.game_font_smaller.render("?", True, "white")
         button_text_rect: pygame.Rect = button_text.get_rect(center=(button_surf.get_width()/2, button_surf.get_height()/2))
+        screen_note: bool = False
 
-        #how to play properties
-        htp_surf: pygame.Surface = pygame.Surface((400, 400))
-        htp_surf.fill("blue")
-        htp_rect: pygame.Rect = pygame.Rect(200, 200, 200, 200)
-        htp_text: pygame.Surface = self.other_font.render("How to play", True, "green")
-        htp_text_surf: pygame.Rect = htp_rect.get_rect(center=(button_surf.get_width()/2, button_surf.get_height()/2))
 
         running: bool = True
         while running:
@@ -52,15 +47,14 @@ class Game:
                 if event.type == pygame.QUIT:
                     running = False
                 if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                    print(pygame.mouse.get_pos(), button_rect)
                     if button_rect.collidepoint(pygame.mouse.get_pos()):
-                        pygame.draw.rect(button_surf, "blue", (200, 200))
+                        screen_note = not screen_note
+                        
                     else:
-                        pygame.draw.rect(button_surf, (255, 255, 255), (0, 0, 200, 200))
-                        pygame.draw.rect(button_surf, (255, 255, 255), (1, 1, 148, 48))
-                        pygame.draw.rect(button_surf, (0, 0, 0), (1, 1, 148, 1), 2)
-                        pygame.draw.rect(button_surf, (0, 100, 0), (1, 48, 148, 10), 2)
+                        pygame.draw.rect(button_surf, (0,0,0), (0, 0, 200, 200))
                 # if event.type == pygame.MOUSEBUTTONDOWN:
-                #     if pygame.mouse.get_pressed()[0]:
+                #     if pygame.mouse.get_pressed()[0]: 
                 #         self.player.grabber.extend()
 
             keys: pygame.key.ScancodeWrapper = pygame.key.get_pressed()
@@ -79,16 +73,18 @@ class Game:
                     self.player.accelerate()
 
             else:
-                self.screen.blit(title_surf, title_rect)
-                self.screen.blit(run_surf, run_rect)
-
+                self.screen.fill("green")
                 if keys[pygame.K_SPACE]:
                     self.game_active = True
 
-                
-
-            button_surf.blit(button_text, button_text_rect)
-            self.screen.blit(button_surf, button_rect)
+                button_surf.blit(button_text, button_text_rect)
+                self.screen.blit(button_surf, button_rect)
+                if screen_note:
+                    pygame.draw.rect(self.screen, "white", (300, 200, 1000, 500), border_radius=50)
+                else:
+                    self.screen.blit(title_surf, title_rect)
+                    self.screen.blit(run_surf, run_rect)
+                    
             pygame.display.update()
             self.clock.tick(60)
 
