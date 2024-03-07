@@ -26,6 +26,7 @@ class Grabber:
         self.max_length: int = self.image.get_height()
 
         self.caught_debris: list[Debris] = []
+        self.points = 0
 
     def extend(self) -> None:
         if self.extension_stage != ExtensionStage.STOPPED:
@@ -56,6 +57,7 @@ class Grabber:
     def collect_debris(self) -> None:
         for debris in self.caught_debris:
             debris.kill()
+            self.points += 1
         self.caught_debris = []
 
     def extension(self) -> None:
@@ -83,6 +85,8 @@ class Grabber:
 
         for debris in debris_list:
             if Collision.circle_circle_collision(hitbox_position, 20, debris.position, 10):
+                if debris.caught:
+                    continue
                 self.caught_debris.append(debris)
                 debris.caught = True
 
@@ -119,3 +123,4 @@ class Grabber:
         rotated_image_rect = rotated_image.get_rect(center=rotated_image_center)
 
         return rotated_image, rotated_image_rect
+    
