@@ -3,6 +3,7 @@ import pygame
 from meteorite import Meteorite
 from player import Player
 from debris import Debris
+from upgrade import UpgradeManager
 
 
 class Game:
@@ -32,6 +33,11 @@ class Game:
         self.debris_spawn_event: int = pygame.event.custom_type()
         Debris.create_random(self.screen_resolution)
 
+        self.points: int = 0
+        self.point_multiplier: int = 10
+
+        self.upgrade_manager: UpgradeManager = UpgradeManager({})
+
     def run(self) -> None:
         bg_surf: pygame.Surface = self.background_generate()
         title_surf: pygame.Surface = self.game_font.render(
@@ -51,14 +57,13 @@ class Game:
         button_text_rect: pygame.Rect = button_text.get_rect(center=(button_surf.get_width()/2, button_surf.get_height()/2))
         screen_note: bool = False
 
-
         running: bool = True
 
         pygame.time.set_timer(self.meteor_spawn_event, int(1000 / self.meteorite_spawn_rate))
         pygame.time.set_timer(self.debris_spawn_event, int(1000 / self.debris_spawn_rate))
-        Font_color = (255,87,51)
+        font_color: tuple[int, int, int] = (255, 87, 51)
         game_font = pygame.font.Font(None, 200)
-        text_surf = game_font.render('DEFEAT', True, Font_color)
+        text_surf = game_font.render('DEFEAT', True, font_color)
         text_rect = text_surf.get_rect(center=(1600 / 2, 900 / 2))
 
         while running:
@@ -69,16 +74,13 @@ class Game:
                     self.player.grabber.extend()
                     if button_rect.collidepoint(pygame.mouse.get_pos()):
                         screen_note = not screen_note
-                        
                     else:
-                        pygame.draw.rect(button_surf, (0,0,0), (0, 0, 200, 200))
-                if event.type == self.meteor_spawn_event:
-                    Meteorite.create_random(self.screen_resolution)
-                if event.type == self.debris_spawn_event:
-                    Debris.create_random(self.screen_resolution)
-                # if event.type == pygame.MOUSEBUTTONDOWN:
-                #     if pygame.mouse.get_pressed()[0]: 
-                #         self.player.grabber.extend()
+                        pygame.draw.rect(button_surf, (0, 0, 0), (0, 0, 200, 200))
+                if self.game_active:
+                    if event.type == self.meteor_spawn_event:
+                        Meteorite.create_random(self.screen_resolution)
+                    if event.type == self.debris_spawn_event:
+                        Debris.create_random(self.screen_resolution)
 
             keys: pygame.key.ScancodeWrapper = pygame.key.get_pressed()
             if self.game_active:
@@ -88,16 +90,16 @@ class Game:
                     self.player.accelerate()
 
                 self.screen.blit(bg_surf, (0, 0))
-                text_points = game_font.render(f"{self.player.grabber.points}", 1, Font_color)
-                self.screen.blit(text_points,(20,20))
+                text_points = game_font.render(f"{self.points}", 1, font_color)
+                self.screen.blit(text_points, (20, 20))
                 Meteorite.meteorites.update(screen=self.screen)
                 Debris.debris_group.update(screen=self.screen)
 
                 if self.player.dead:
                     self.screen.blit(text_surf, text_rect)
 
-                self.player.update()
-                self.player.grabber.check_collect(Debris.debris_group.sprites(), screen=self.screen)
+                self.points += self.player.update() * self.point_multiplier
+                self.player.grabber.check_collect(Debris.debris_group.sprites())
                 collision: bool = self.player.check_collision(Meteorite.meteorites.sprites())
                 if collision:
                     self.player.die()
@@ -118,6 +120,8 @@ class Game:
                     
             pygame.display.update()
             self.clock.tick(60)
+
+            print(self.clock.get_fps())
 
         pygame.quit()
 

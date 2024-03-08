@@ -26,7 +26,6 @@ class Grabber:
         self.max_length: int = self.image.get_height()
 
         self.caught_debris: list[Debris] = []
-        self.points = 0
 
     def extend(self) -> None:
         if self.extension_stage != ExtensionStage.STOPPED:
@@ -35,13 +34,15 @@ class Grabber:
         self.rotate()
         self.extension_stage = ExtensionStage.EXTENDING
 
-    def update(self, position: pygame.Vector2) -> None:
+    def update(self, position: pygame.Vector2) -> int:
         self.move(position)
         self.extension()
 
         self.drag_debris()
         if self.length == 0:
-            self.collect_debris()
+            return self.collect_debris()
+        else:
+            return 0
 
     def move(self, position: pygame.Vector2) -> None:
         self.position = position
@@ -54,11 +55,14 @@ class Grabber:
         for debris in self.caught_debris:
             debris.snap(end_position)
 
-    def collect_debris(self) -> None:
+    def collect_debris(self) -> int:
+        points: int = len(self.caught_debris)
+
         for debris in self.caught_debris:
             debris.kill()
-            self.points += 1
         self.caught_debris = []
+
+        return points
 
     def extension(self) -> None:
         if self.extension_stage == ExtensionStage.STOPPED:
@@ -76,7 +80,7 @@ class Grabber:
             self.length = self.max_length
             self.extension_stage = ExtensionStage.RETRACTING
 
-    def check_collect(self, debris_list: list[Debris], screen) -> None:
+    def check_collect(self, debris_list: list[Debris]) -> None:
         if self.extension_stage == ExtensionStage.STOPPED:
             return
 

@@ -67,11 +67,11 @@ class Player:
 
         screen.blit(rotated_image, rotated_rect)
 
-    def update(self) -> None:
+    def update(self) -> int:
         self.animate()
         self.move()
-        self.grabber.update(self.position)
         self.out_screen()
+        return self.grabber.update(self.position)
 
     def accelerate(self) -> None:
         acceleration: pygame.Vector2 = pygame.Vector2(0, 1).rotate(-self.direction) * self.acceleration
