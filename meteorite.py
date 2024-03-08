@@ -1,6 +1,5 @@
 import math
 import random
-import copy
 
 import pygame
 
@@ -51,7 +50,7 @@ class Meteorite(pygame.sprite.Sprite):
 
     @staticmethod
     def create_random(screen_resolution: tuple[int, int]) -> None:
-        radius: int = random.randrange(50, 150)
+        radius: int = random.randrange(50, 140)
         position: pygame.Vector2 = Meteorite.generate_point_outside_screen(screen_resolution, radius)
         direction: float = Meteorite.create_random_direction(screen_resolution, position)
         speed: float = random.random() * 2 + 1
@@ -60,8 +59,7 @@ class Meteorite(pygame.sprite.Sprite):
 
     @staticmethod
     def create_random_direction(screen_resolution: tuple[int, int], position: pygame.Vector2) -> float:
-        point: pygame.Vector2 = pygame.Vector2(random.randint(50, screen_resolution[0] - 50),
-                                               random.randint(50, screen_resolution[1] - 50))
+        point: pygame.Vector2 = pygame.Vector2(random.randint(50, screen_resolution[0] - 50), random.randint(50, screen_resolution[1] - 50))
 
         return math.degrees(math.atan2(point.x - position.x, point.y - position.y))
 
