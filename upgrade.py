@@ -38,14 +38,14 @@ class UpgradeManager:
             "max velocity": [100, 130, 185, 234],
             "acceleration": [240, 315],
             "rotation speed": [310, 420],
-            "can slow down": [560],
+            "can slow down": [240],
             "grabber speed": [60, 100],
             "grabber length": [145, 187, 252, 301]
         }
         self.upgrage_values: dict[str, list[float | bool]] = {
             "max velocity": [3, 3.3, 3.5, 3.8, 4.2],
             "acceleration": [0.5, 0.8, 1],
-            "rotation speed": [2, 3, 4],
+            "rotation speed": [2, 2.7, 3.5],
             "can slow down": [False, True],
             "grabber speed": [5, 9, 13],
             "grabber length": [0, 1, 2, 3, 4]
@@ -55,22 +55,37 @@ class UpgradeManager:
         for upgrade, value in self.upgrades.items():
             self.upgrades[upgrade] = min(value, self.max_upgrades[upgrade])
 
-    def try_buy(self, upgrade_name: str, points: int) -> bool:
+    def is_maxed(self, upgrade_name: str) -> bool:
+        return self.upgrades[upgrade_name] == self.max_upgrades[upgrade_name]
+
+    def can_buy(self, upgrade_name: str, points: int) -> bool:
         upgrade_level: int = self.upgrades[upgrade_name]
-        print(upgrade_name, points, self.upgrade_cost[upgrade_name][upgrade_level])
-        if self.upgrade_cost[upgrade_name][upgrade_level] > points:
+
+        if upgrade_level == self.max_upgrades[upgrade_name]:
             return False
-        elif upgrade_level == self.max_upgrades[upgrade_name]:
+        elif self.upgrade_cost[upgrade_name][upgrade_level] > points:
             return False
 
-        print("+1")
+        return True
+
+    def try_buy(self, upgrade_name: str, points: int) -> bool:
+        if not self.can_buy(upgrade_name, points):
+            return False
+
         self.upgrades[upgrade_name] += 1
         return True
 
     def get_random_upgrades(self, amount: int) -> list[tuple[str, int, int]]:
         upgrades: set[tuple[str, int, int]] = set()
-        while len(upgrades) < amount:
+
+        limit: int = 100
+        while len(upgrades) < amount and limit > 0:
+            limit -= 1
             upgrade: str = random.choice(list(self.upgrades.keys()))
+
+            if self.is_maxed(upgrade):
+                continue
+
             upgrades.add((upgrade, self.upgrades[upgrade],
                           self.upgrade_cost[upgrade][self.upgrades[upgrade]]))
         return list(upgrades)

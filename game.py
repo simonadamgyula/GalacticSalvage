@@ -27,7 +27,9 @@ class Game:
         self.player: Player = Player(
             self.screen_resolution[0] // 2, self.screen_resolution[1] // 2, 0
         )
+
         self.game_state: GameState = GameState["MAIN_MENU"]
+
         self.game_font = pygame.font.Font("font/Beyonders-6YoJM.ttf", 80)
         self.game_font_smaller = pygame.font.Font("font/Beyonders-6YoJM.ttf", 40)
         self.upgrade_button_font: pygame.font.Font = pygame.font.Font("font/Beyonders-6YoJM.ttf", 20)
@@ -112,12 +114,19 @@ class Game:
                     for card in self.upgrade_cards:
                         if card.button.rect.collidepoint(pygame.mouse.get_pos()):
                             success: bool = card.button.click()
-                            print(success)
+                            if success:
+                                self.player.load_upgrades(self.upgrade_manager.get_upgrade_values)
                 if self.game_state == GameState["IN_GAME"]:
                     if event.type == self.meteor_spawn_event:
                         Meteorite.create_random(self.screen_resolution)
                     if event.type == self.debris_spawn_event:
                         Debris.create_random(self.screen_resolution)
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_SPACE:
+                        if self.game_state == GameState["MAIN_MENU"]:
+                            self.set_game_state(GameState["IN_GAME"])
+                        elif self.game_state == GameState["IN_GAME"] and self.player.dead:
+                            self.reset()
 
             keys: pygame.key.ScancodeWrapper = pygame.key.get_pressed()
             if self.game_state == GameState["IN_GAME"]:
@@ -147,8 +156,6 @@ class Game:
 
             elif self.game_state == GameState["MAIN_MENU"]:
                 self.screen.fill("black")
-                if keys[pygame.K_SPACE]:
-                    self.game_state = GameState["IN_GAME"]
 
                 button_surf.blit(button_text, button_text_rect)
                 self.screen.blit(button_surf, button_rect)
@@ -169,6 +176,13 @@ class Game:
 
         pygame.quit()
 
+    def reset(self) -> None:
+        self.player.reset()
+        self.new_upgrades()
+        self.set_game_state(GameState["MAIN_MENU"])
+        Meteorite.meteorites.empty()
+        Debris.debris_group.empty()
+
     def set_game_state(self, state: GameState) -> None:
         self.game_state = state
 
@@ -181,14 +195,17 @@ class Game:
         self.upgrade_cards = []
 
         for index, upgrade in enumerate(rand_upgrades):
-            self.upgrade_cards.append(UpgradeCard((400 * (index + 1), 400), (200, 300),
-                                                  upgrade[0], self.upgrade_button_font, "img/debris/satellite.png",
-                                                  "black", "white",
-                                                  self.upgrade_card_click(upgrade[0])))
+            self.upgrade_cards.append(UpgradeCard((400 * (index + 1), 400), (200, 300), upgrade[0],
+                                                  upgrade[2], self.upgrade_button_font, "img/debris/satellite.png",
+                                                  "black", "white", self.upgrade_card_click(upgrade[0]),
+                                                  self.upgrade_can_buy(upgrade[0])))
 
     # don't know why this is needed, but doesn't work without it
     def upgrade_card_click(self, upgrade_name: str) -> Callable[[], bool]:
         return lambda: self.upgrade_manager.try_buy(upgrade_name, self.points)
+
+    def upgrade_can_buy(self, upgrade_name: str) -> Callable[[], bool]:
+        return lambda: self.upgrade_manager.can_buy(upgrade_name, self.points)
 
     @staticmethod
     def background_generate():

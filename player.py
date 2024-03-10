@@ -13,6 +13,7 @@ def clamp(value: float, min_: float, max_: float) -> float:
 
 class Player:
     def __init__(self, x: int, y: int, direction: float) -> None:
+        self.starting_position: pygame.Vector2 = pygame.Vector2(x, y)
         self.position: pygame.Vector2 = pygame.Vector2(x, y)
         self.direction: float = direction
 
@@ -52,6 +53,12 @@ class Player:
     @property
     def resolution(self) -> tuple[int, int]:
         return self.image.get_width(), self.image.get_height()
+
+    def reset(self) -> None:
+        self.position = self.starting_position.copy()
+        self.dead = False
+        self.velocity = pygame.Vector2(0, 0)
+        self.death_animation.reset()
 
     def draw(self, screen: pygame.Surface) -> None:
         if self.dead:
