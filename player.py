@@ -1,5 +1,5 @@
-import pygame
 import math
+import pygame
 
 from grabber import Grabber
 from meteorite import Meteorite
@@ -20,6 +20,7 @@ class Player:
 
         self.velocity: pygame.Vector2 = pygame.Vector2(0, 0)
         self.acceleration: float = 0.5
+        self.deceleration: float = 0.02
         self.max_velocity: float = 3
 
         self.images_nmoving: list[pygame.Surface] = []
@@ -42,11 +43,12 @@ class Player:
         self.image: pygame.Surface = self.images_nmoving[self.frame_index]
 
         self.moving = False
+        self.can_slow_down: bool = False
 
         self.grabber: Grabber = Grabber(self.position)
 
         self.dead = False
-        
+
     @property
     def resolution(self) -> tuple[int, int]:
         return self.image.get_width(), self.image.get_height()
@@ -75,10 +77,14 @@ class Player:
 
     def accelerate(self) -> None:
         acceleration: pygame.Vector2 = pygame.Vector2(0, 1).rotate(-self.direction) * self.acceleration
-        
+
         self.velocity += acceleration
         self.velocity = self.velocity.clamp_magnitude(self.max_velocity)
         self.moving = True
+
+    def slow_down(self) -> None:
+        if self.can_slow_down:
+            self.velocity *= 1 - self.deceleration
 
     def move(self) -> None:
         if self.dead:
@@ -102,7 +108,7 @@ class Player:
             self.image = self.images[int(self.frame_index)]
 
         self.moving = False
-        
+
     def get_verticies(self) -> list[pygame.Vector2]:
         width: int = self.image.get_width()
         height: int = self.image.get_height()
@@ -138,3 +144,11 @@ class Player:
 
     def die(self) -> None:
         self.dead = True
+
+    def load_upgrades(self, upgrades: dict[str, float | bool]) -> None:
+        self.max_velocity = upgrades["max velocity"]
+        self.acceleration = upgrades["acceleration"]
+        self.rotation_speed = upgrades["rotation speed"]
+        self.grabber.extension_speed = upgrades["grabber speed"]
+        self.can_slow_down = bool(upgrades["can slow down"])
+        # self.grabber.max_length = upgrades["grabber_length"]

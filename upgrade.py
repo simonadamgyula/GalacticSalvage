@@ -1,3 +1,6 @@
+import random
+
+
 class UpgradeManager:
     @property
     def get_upgrades_to_show(self) -> list[tuple[str, int, int | None]]:
@@ -7,30 +10,45 @@ class UpgradeManager:
                                  self.upgrade_cost[upgrade][value] if value != self.max_upgrades[upgrade] else None))
         return upgrade_list
 
+    @property
+    def get_upgrade_values(self) -> dict[str, float | bool]:
+        upgrade_values: dict[str, float | bool] = {}
+        for upgrade, value in self.upgrades.items():
+            upgrade_values[upgrade] = self.upgrage_values[upgrade][value]
+        return upgrade_values
+
     def __init__(self, upgrades: dict[str, int]) -> None:
         self.upgrades: dict[str, int] = {
-            "max_velocity": 0,
+            "max velocity": 0,
             "acceleration": 0,
-            "rotation_speed": 0,
-            "can_slow_down": 0,
-            "grabber_speed": 0,
-            "grabber_length": 0
+            "rotation speed": 0,
+            "can slow down": 0,
+            "grabber speed": 0,
+            "grabber length": 0
         }
         self.max_upgrades: dict[str, int] = {
-            "max_velocity": 4,
+            "max velocity": 4,
             "acceleration": 2,
-            "rotation_speed": 2,
-            "can_slow_down": 1,
-            "grabber_speed": 2,
-            "grabber_length": 4
+            "rotation speed": 2,
+            "can slow down": 1,
+            "grabber speed": 2,
+            "grabber length": 4
         }
         self.upgrade_cost: dict[str, list[int]] = {
-            "max_velocity": [100, 130, 185, 234],
+            "max velocity": [100, 130, 185, 234],
             "acceleration": [240, 315],
-            "rotation_speed": [310, 420],
-            "can_slow_down": [560],
-            "grabber_speed": [60, 100],
-            "grabber_length": [145, 187, 252, 301]
+            "rotation speed": [310, 420],
+            "can slow down": [560],
+            "grabber speed": [60, 100],
+            "grabber length": [145, 187, 252, 301]
+        }
+        self.upgrage_values: dict[str, list[float | bool]] = {
+            "max velocity": [3, 3.3, 3.5, 3.8, 4.2],
+            "acceleration": [0.5, 0.8, 1],
+            "rotation speed": [2, 3, 4],
+            "can slow down": [False, True],
+            "grabber speed": [5, 9, 13],
+            "grabber length": [0, 1, 2, 3, 4]
         }
 
         self.upgrades.update(upgrades)
@@ -39,10 +57,20 @@ class UpgradeManager:
 
     def try_buy(self, upgrade_name: str, points: int) -> bool:
         upgrade_level: int = self.upgrades[upgrade_name]
-        if self.upgrade_cost[upgrade_name][upgrade_level] < points:
+        print(upgrade_name, points, self.upgrade_cost[upgrade_name][upgrade_level])
+        if self.upgrade_cost[upgrade_name][upgrade_level] > points:
             return False
         elif upgrade_level == self.max_upgrades[upgrade_name]:
             return False
 
+        print("+1")
         self.upgrades[upgrade_name] += 1
         return True
+
+    def get_random_upgrades(self, amount: int) -> list[tuple[str, int, int]]:
+        upgrades: set[tuple[str, int, int]] = set()
+        while len(upgrades) < amount:
+            upgrade: str = random.choice(list(self.upgrades.keys()))
+            upgrades.add((upgrade, self.upgrades[upgrade],
+                          self.upgrade_cost[upgrade][self.upgrades[upgrade]]))
+        return list(upgrades)
