@@ -46,7 +46,7 @@ class Game:
         Debris.create_random(self.screen_resolution)
 
         self.current_points: int = 0
-        self.points: int = 0
+        self.points: int = 145
         self.point_multiplier: int = 10
 
         self.upgrade_manager: UpgradeManager = UpgradeManager({
@@ -55,6 +55,7 @@ class Game:
             # "grabber_speed": 2,w
             # "rotation_speed": 2,aa
             # "can_slow_down": 1,
+            "grabber length": 4
         })
         self.player.load_upgrades(self.upgrade_manager.get_upgrade_values)
 

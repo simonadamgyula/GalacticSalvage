@@ -158,4 +158,4 @@ class Player:
         self.rotation_speed = upgrades["rotation speed"]
         self.grabber.extension_speed = upgrades["grabber speed"]
         self.can_slow_down = bool(upgrades["can slow down"])
-        # self.grabber.max_length = upgrades["grabber_length"]
+        self.grabber.update_length(upgrades["grabber length"])
