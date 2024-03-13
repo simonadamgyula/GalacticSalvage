@@ -4,12 +4,17 @@ from collections.abc import Callable
 import pygame
 
 
+def log(*, center: typing.Any) -> None:
+    print(center)
+
+
 class Button:
     def __init__(self, size: tuple[int, int], text: str, font: pygame.font.Font, bg_color: tuple[int, int, int] | str,
                  font_color: tuple[int, int, int] | str, function: Callable[[], typing.Any],
                  active: Callable[[], bool] = lambda: True, usage: int = -1,
                  disabled_color: tuple[int, int, int] | str = "gray", **position: tuple[int, int]) -> None:
         self.surface: pygame.Surface = pygame.Surface(size, pygame.SRCALPHA, 32).convert_alpha()
+        log(**position)
         self.rect: pygame.Rect = self.surface.get_rect(**position)
         self.text: pygame.Surface = font.render(text, True, font_color)
         self.text_rect: pygame.Rect = self.text.get_rect(
@@ -85,12 +90,15 @@ class UpgradeCard:
                  function: Callable[[], typing.Any], active: Callable[[], bool],
                  disabled_color: tuple[int, int, int] | str = "gray", **position: tuple[int, int]) -> None:
         self.surface: pygame.Surface = pygame.Surface(size, pygame.SRCALPHA, 32).convert_alpha()
-        self.image: Image = Image(image, **position)
-        self.name: Text = Text(text, font, font_color, **position)
-        self.price_text: Text = Text(f"Price: {price}", font, font_color, **position)
+
+        position: tuple[int, int] = position.get("center", (0, 0))
+
+        self.image: Image = Image(image, center=position)
+        self.name: Text = Text(text, font, font_color, center=(position[0], position[1] + 100))
+        self.price_text: Text = Text(f"Price: {price}", font, font_color, center=(position[0], position[1] + 200))
         self.button: Button = Button((100, 50),
                                      "Buy", font, color, font_color, function, active=active,
-                                     usage=1, disabled_color=disabled_color, **position)
+                                     usage=1, disabled_color=disabled_color, center=(position[0], position[1] + 300))
 
     def draw(self, screen: pygame.Surface) -> None:
         self.image.draw(screen)

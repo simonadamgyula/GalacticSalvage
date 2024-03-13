@@ -53,20 +53,20 @@ class Game:
             # "max_velocity": 4,
             # "acceleration": 2,
             # "grabber_speed": 2,w
-            # "rotation_speed": 2,
+            # "rotation_speed": 2,aa
             # "can_slow_down": 1,
         })
         self.player.load_upgrades(self.upgrade_manager.get_upgrade_values)
 
-        self.upgrade_button: Button = Button((800, 750), "Upgrade", self.upgrade_button_font,
+        self.upgrade_button: Button = Button((200, 100), "Upgrade", self.upgrade_button_font,
                                              (63, 63, 63), "white",
                                              lambda: self.set_game_state(GameState["UPGRADE_MENU"]),
-                                             lambda: self.game_state == GameState["MAIN_MENU"], center=(200, 100))
+                                             lambda: self.game_state == GameState["MAIN_MENU"], center=(800, 750))
         self.back_button: Button = Button((100, 100), "Back", self.upgrade_button_font,
                                           (63, 63, 63), "white", lambda: self.set_game_state(GameState["MAIN_MENU"]),
                                           lambda: self.game_state == GameState["UPGRADE_MENU"], center=(100, 100))
         self.point_counter: Counter = Counter(self.counter_font, (255, 87, 51), center=(300, 100))
-        self.in_game_counter: Counter = Counter(self.counter_font, (255, 87, 51), center=(100, 100))
+        self.in_game_counter: Counter = Counter(self.counter_font, (255, 87, 51), topleft=(20, 20))
 
         self.upgrade_cards: list[UpgradeCard] = []
         self.new_upgrades()
