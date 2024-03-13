@@ -19,6 +19,13 @@ class Debris(pygame.sprite.Sprite):
         self.rotation: float = 0
 
         self.image: pygame.Surface = pygame.image.load("./img/debris/satellite.png")
+        self.image2: pygame.Surface = pygame.image.load("./img/debris/lilcupship.png")
+        self.image3: pygame.Surface = pygame.image.load("./img/debris/sadwalle.png")
+
+        self.images = [self.image, self.image2, self.image3]
+
+        random_num: int = random.randint(0,2)
+        self.image = self.images[random_num]
 
         self.caught: bool = False
 
