@@ -1,10 +1,11 @@
-import pygame
 import math
 
+import pygame
+
+from animation import Animation
+from collision import Collision
 from grabber import Grabber
 from meteorite import Meteorite
-from collision import Collision
-from animation import Animation
 
 
 def clamp(value: float, min_: float, max_: float) -> float:
@@ -33,7 +34,9 @@ class Player:
         self.images.append(pygame.image.load("img/spaceship/moving/4.png"))
         self.images.append(pygame.image.load("img/spaceship/moving/5.png"))
 
-        self.death_animation: Animation = Animation.import_spritesheet("img/explosion.png", 224, 224, 0.2,  False)
+        self.death_animation: Animation = Animation.import_spritesheet(
+            "img/explosion.png", 224, 224, 0.2, False
+        )
 
         self.frame_index = 0
         self.animation_speed: float = 0.3
@@ -46,7 +49,7 @@ class Player:
         self.grabber: Grabber = Grabber(self.position)
 
         self.dead = False
-        
+
     @property
     def resolution(self) -> tuple[int, int]:
         return self.image.get_width(), self.image.get_height()
@@ -74,8 +77,10 @@ class Player:
         self.out_screen()
 
     def accelerate(self) -> None:
-        acceleration: pygame.Vector2 = pygame.Vector2(0, 1).rotate(-self.direction) * self.acceleration
-        
+        acceleration: pygame.Vector2 = (
+            pygame.Vector2(0, 1).rotate(-self.direction) * self.acceleration
+        )
+
         self.velocity += acceleration
         self.velocity = self.velocity.clamp_magnitude(self.max_velocity)
         self.moving = True
@@ -102,17 +107,21 @@ class Player:
             self.image = self.images[int(self.frame_index)]
 
         self.moving = False
-        
+
     def get_verticies(self) -> list[pygame.Vector2]:
         width: int = self.image.get_width()
         height: int = self.image.get_height()
 
         verticies: list[pygame.Vector2] = []
         for i in range(4):
-            binary: str = format(i, 'b').zfill(2)
-            verticies.append(pygame.Vector2((width / 2) * (1 if binary[0] == '0' else -1),
-                                            (height / 2) * (1 if binary[1] == '0' else -1))
-                             .rotate(-self.direction) + self.position)
+            binary: str = format(i, "b").zfill(2)
+            verticies.append(
+                pygame.Vector2(
+                    (width / 2) * (1 if binary[0] == "0" else -1),
+                    (height / 2) * (1 if binary[1] == "0" else -1),
+                ).rotate(-self.direction)
+                + self.position
+            )
 
         verticies[-1], verticies[-2] = verticies[-2], verticies[-1]
         return verticies
@@ -120,21 +129,38 @@ class Player:
     def check_collision(self, meteorites: list[Meteorite]) -> bool:
         verticies: list[pygame.Vector2] = self.get_verticies()
         for meteorite in meteorites:
-            if (meteorite.radius + math.sqrt((self.image.get_width() / 2) ** 2 + (self.image.get_height() / 2) ** 2) <
-                    (self.position - meteorite.position).magnitude()):
+            if (
+                meteorite.radius
+                + math.sqrt(
+                    (self.image.get_width() / 2) ** 2
+                    + (self.image.get_height() / 2) ** 2
+                )
+                < (self.position - meteorite.position).magnitude()
+            ):
                 continue
 
-            if Collision.rectangle_circle_collision(self.position, verticies, meteorite.position, meteorite.radius):
+            if Collision.rectangle_circle_collision(
+                self.position, verticies, meteorite.position, meteorite.radius
+            ):
                 return True
 
         return False
 
     def out_screen(self) -> None:
         if (
-            self.position.x > 1600 or self.position.x < 0 or
-            self.position.y > 900 or self.position.y < 0
+            self.position.x > 1600
+            or self.position.x < 0
+            or self.position.y > 900
+            or self.position.y < 0
         ):
             self.die()
 
     def die(self) -> None:
         self.dead = True
+
+    def check_kill_collision(self, kill_rect: pygame.Rect) -> bool:
+        vertices: list[pygame.Vector2] = self.get_verticies()
+        for vertex in vertices:
+            if kill_rect.collidepoint(vertex.x, vertex.y):
+                return True
+        return False
