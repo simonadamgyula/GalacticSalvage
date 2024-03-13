@@ -1,3 +1,4 @@
+import typing
 from enum import Enum
 from collections.abc import Callable
 
@@ -8,7 +9,7 @@ from player import Player
 from debris import Debris
 from upgrade import UpgradeManager
 
-from uielemnts import Button, UpgradeCard
+from uielemnts import Button, UpgradeCard, Counter
 
 GameState = Enum("GameState", ["MAIN_MENU", "IN_GAME", "UPGRADE_MENU"])
 
@@ -30,8 +31,9 @@ class Game:
 
         self.game_state: GameState = GameState["MAIN_MENU"]
 
-        self.game_font = pygame.font.Font("font/Beyonders-6YoJM.ttf", 80)
-        self.game_font_smaller = pygame.font.Font("font/Beyonders-6YoJM.ttf", 40)
+        self.counter_font: pygame.font.Font = pygame.font.Font(None, 200)
+        self.game_font: pygame.font.Font = pygame.font.Font("font/Beyonders-6YoJM.ttf", 80)
+        self.game_font_smaller: pygame.font.Font = pygame.font.Font("font/Beyonders-6YoJM.ttf", 40)
         self.upgrade_button_font: pygame.font.Font = pygame.font.Font("font/Beyonders-6YoJM.ttf", 20)
         self.other_font = pygame.font.Font("font/ninifont-caps.otf", 50)
 
@@ -43,6 +45,7 @@ class Game:
         self.debris_spawn_event: int = pygame.event.custom_type()
         Debris.create_random(self.screen_resolution)
 
+        self.current_points: int = 0
         self.points: int = 0
         self.point_multiplier: int = 10
 
@@ -55,13 +58,15 @@ class Game:
         })
         self.player.load_upgrades(self.upgrade_manager.get_upgrade_values)
 
-        self.upgrade_button: Button = Button((200, 100), (800, 750), "Upgrade", self.upgrade_button_font,
+        self.upgrade_button: Button = Button((800, 750), "Upgrade", self.upgrade_button_font,
                                              (63, 63, 63), "white",
                                              lambda: self.set_game_state(GameState["UPGRADE_MENU"]),
-                                             lambda: self.game_state == GameState["MAIN_MENU"])
-        self.back_button: Button = Button((100, 100), (100, 100), "Back", self.upgrade_button_font,
+                                             lambda: self.game_state == GameState["MAIN_MENU"], center=(200, 100))
+        self.back_button: Button = Button((100, 100), "Back", self.upgrade_button_font,
                                           (63, 63, 63), "white", lambda: self.set_game_state(GameState["MAIN_MENU"]),
-                                          lambda: self.game_state == GameState["UPGRADE_MENU"])
+                                          lambda: self.game_state == GameState["UPGRADE_MENU"], center=(100, 100))
+        self.point_counter: Counter = Counter(self.counter_font, (255, 87, 51), center=(300, 100))
+        self.in_game_counter: Counter = Counter(self.counter_font, (255, 87, 51), center=(100, 100))
 
         self.upgrade_cards: list[UpgradeCard] = []
         self.new_upgrades()
@@ -90,8 +95,7 @@ class Game:
         pygame.time.set_timer(self.meteor_spawn_event, int(1000 / self.meteorite_spawn_rate))
         pygame.time.set_timer(self.debris_spawn_event, int(1000 / self.debris_spawn_rate))
         font_color: tuple[int, int, int] = (255, 87, 51)
-        game_font = pygame.font.Font(None, 200)
-        text_surf = game_font.render('DEFEAT', True, font_color)
+        text_surf = self.counter_font.render('DEFEAT', True, font_color)
         text_rect = text_surf.get_rect(center=(1600 / 2, 900 / 2))
 
         running: bool = True
@@ -139,15 +143,17 @@ class Game:
                     self.player.slow_down()
 
                 self.screen.blit(bg_surf, (0, 0))
-                text_points = game_font.render(f"{self.points}", 1, font_color)
-                self.screen.blit(text_points, (20, 20))
+
+                self.in_game_counter.update(self.current_points)
+                self.in_game_counter.draw(self.screen)
+
                 Meteorite.meteorites.update(screen=self.screen)  # type: ignore
                 Debris.debris_group.update(screen=self.screen)  # type: ignore
 
                 if self.player.dead:
                     self.screen.blit(text_surf, text_rect)
 
-                self.points += self.player.update() * self.point_multiplier
+                self.current_points += self.player.update() * self.point_multiplier
                 self.player.grabber.check_collect(Debris.debris_group.sprites())  # type: ignore
                 collision: bool = self.player.check_collision(Meteorite.meteorites.sprites())  # type: ignore
                 if collision:
@@ -168,6 +174,10 @@ class Game:
                     self.upgrade_button.draw(self.screen)
             elif self.game_state == GameState["UPGRADE_MENU"]:
                 self.screen.fill("blue")
+
+                self.point_counter.update(self.points)
+                self.point_counter.draw(self.screen)
+
                 self.back_button.draw(self.screen)
                 self.draw_upgrade_cards()
 
@@ -183,6 +193,9 @@ class Game:
         Meteorite.meteorites.empty()
         Debris.debris_group.empty()
 
+        self.points += self.current_points
+        self.current_points = 0
+
     def set_game_state(self, state: GameState) -> None:
         self.game_state = state
 
@@ -195,17 +208,20 @@ class Game:
         self.upgrade_cards = []
 
         for index, upgrade in enumerate(rand_upgrades):
-            self.upgrade_cards.append(UpgradeCard((400 * (index + 1), 400), (200, 300), upgrade[0],
+            callables: tuple[Callable[[], typing.Any], Callable[[], bool]] = self.create_callables(upgrade[0])
+            self.upgrade_cards.append(UpgradeCard((200, 300), upgrade[0],
                                                   upgrade[2], self.upgrade_button_font, "img/debris/satellite.png",
-                                                  "black", "white", self.upgrade_card_click(upgrade[0]),
-                                                  self.upgrade_can_buy(upgrade[0])))
+                                                  "black", "white", callables[0],
+                                                  callables[1], center=(400 * (index + 1), 400)))
 
     # don't know why this is needed, but doesn't work without it
-    def upgrade_card_click(self, upgrade_name: str) -> Callable[[], bool]:
-        return lambda: self.upgrade_manager.try_buy(upgrade_name, self.points)
+    def create_callables(self, upgrade_name: str) -> tuple[Callable[[], typing.Any], Callable[[], bool]]:
+        return (lambda: self.try_buy(upgrade_name),
+                lambda: self.upgrade_manager.can_buy(upgrade_name, self.points))
 
-    def upgrade_can_buy(self, upgrade_name: str) -> Callable[[], bool]:
-        return lambda: self.upgrade_manager.can_buy(upgrade_name, self.points)
+    def try_buy(self, upgrade_name: str) -> None:
+        cost: int = self.upgrade_manager.try_buy(upgrade_name, self.points)
+        self.points -= cost
 
     @staticmethod
     def background_generate():
