@@ -24,7 +24,8 @@ class UpgradeManager:
             "rotation speed": 0,
             "can slow down": 0,
             "grabber speed": 0,
-            "grabber length": 0
+            "grabber length": 0,
+            "shield": 0
         }
         self.max_upgrades: dict[str, int] = {
             "max velocity": 4,
@@ -32,7 +33,8 @@ class UpgradeManager:
             "rotation speed": 2,
             "can slow down": 1,
             "grabber speed": 2,
-            "grabber length": 4
+            "grabber length": 4,
+            "shield": 2
         }
         self.upgrade_cost: dict[str, list[int]] = {
             "max velocity": [100, 130, 185, 234],
@@ -40,7 +42,8 @@ class UpgradeManager:
             "rotation speed": [310, 420],
             "can slow down": [240],
             "grabber speed": [100, 150],
-            "grabber length": [145, 187, 252, 301]
+            "grabber length": [145, 187, 252, 301],
+            "shield": [360, 530]
         }
         self.upgrade_values: dict[str, list[float | bool]] = {
             "max velocity": [3, 3.3, 3.5, 3.8, 4.2],
@@ -48,7 +51,8 @@ class UpgradeManager:
             "rotation speed": [2, 2.7, 3.5],
             "can slow down": [False, True],
             "grabber speed": [5, 9, 13],
-            "grabber length": [0, 1, 2, 3, 4]
+            "grabber length": [0, 1, 2, 3, 4],
+            "shield": [0, 1, 2]
         }
 
         self.upgrades.update(upgrades)

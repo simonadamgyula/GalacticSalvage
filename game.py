@@ -56,6 +56,7 @@ class Game:
             # "rotation_speed": 2,aa
             # "can_slow_down": 1,
             # "grabber length": 4
+            "shield": 2
         })
         self.player.load_upgrades(self.upgrade_manager.get_upgrade_values)
 
@@ -158,7 +159,7 @@ class Game:
                 self.player.grabber.check_collect(Debris.debris_group.sprites())  # type: ignore
                 collision: bool = self.player.check_collision(Meteorite.meteorites.sprites())  # type: ignore
                 if collision:
-                    self.player.die()
+                    self.player.get_hit()
                 self.player.draw(self.screen)
 
             elif self.game_state == GameState["MAIN_MENU"]:

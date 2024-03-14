@@ -45,6 +45,8 @@ class Player:
 
         self.moving = False
         self.can_slow_down: bool = False
+        self.max_shield: int = 0
+        self.shield: int = self.max_shield
 
         self.grabber: Grabber = Grabber(self.position)
 
@@ -57,6 +59,7 @@ class Player:
     def reset(self) -> None:
         self.position = self.starting_position.copy()
         self.dead = False
+        self.shield = self.max_shield
         self.velocity = pygame.Vector2(0, 0)
         self.death_animation.reset()
 
@@ -147,7 +150,15 @@ class Player:
             self.position.x > 1600 or self.position.x < 0 or
             self.position.y > 900 or self.position.y < 0
         ):
-            self.die()
+            self.get_hit()
+
+    def get_hit(self) -> None:
+        print("hit")
+        if self.shield > 0:
+            self.shield -= 1
+            return
+        print("dead")
+        self.die()
 
     def die(self) -> None:
         self.dead = True
@@ -159,3 +170,6 @@ class Player:
         self.grabber.extension_speed = upgrades["grabber speed"]
         self.can_slow_down = bool(upgrades["can slow down"])
         self.grabber.update_length(upgrades["grabber length"])
+
+        self.max_shield = upgrades["shield"]
+        self.shield = self.max_shield
