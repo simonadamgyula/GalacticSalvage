@@ -12,18 +12,16 @@ class Laser(pygame.sprite.Sprite):
         self.pos2 = (1600 - pos[0], pos[1])
         self.colors = [
             (255, 255, 255),
-            (240, 218, 255),
-            (240, 218, 255),
-            (217, 162, 255),
-            (217, 162, 255),
-            (193, 103, 255),
-            (183, 79, 255),
-            (183, 79, 255),
+            ( 255, 226, 226 ),
+            ( 255, 196, 196 ),
+            (255, 167, 167),
+            ( 255, 134, 134 ),
+            ( 255, 81, 81 ),
+            ( 254, 46, 46 ),
+            ( 255, 16, 16 ),
         ]
         self.show_warning = False
         self.laser_go = False
-        self.warning_timer = 0
-        self.laser_go_timer = 0
         self.kill_rect = pygame.Rect((0, self.pos[1], 1600, 90)
         )
 
@@ -40,12 +38,14 @@ class Laser(pygame.sprite.Sprite):
     def draw_laser(self, screen: pygame.Surface) -> None:
         if self.laser_go:
             height = 90
-            for color in self.colors:
+            pos = self.pos[1]
+            for color in self.colors[::-1]:
                 surface = pygame.Surface((1600, height), pygame.SRCALPHA)
                 pygame.draw.rect(
                     surface, (*color, 100), pygame.Rect(0, 0, 1600, height)
                 )
-                screen.blit(surface, (0, self.pos[1]))
+                screen.blit(surface, (0, pos + 5))
+                pos += 5
                 height -= 10
         self.kill_rect = pygame.Rect((0, self.pos[1]-10, 1600, 70)
         )

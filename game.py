@@ -39,8 +39,11 @@ class Game:
             ),
             self.screen,
         )
-
-        self.warning_clock = 0
+        self.laser_spawn: int = pygame.event.custom_type()
+        self.laser_timer: int = pygame.event.custom_type()
+        self.warning_spawn: int = pygame.event.custom_type()
+        self.warning_timer: int = pygame.event.custom_type()
+        
 
     def run(self) -> None:
         bg_surf: pygame.Surface = self.background_generate()
@@ -71,6 +74,11 @@ class Game:
         pygame.time.set_timer(
             self.debris_spawn_event, int(1000 / self.debris_spawn_rate)
         )
+        
+        pygame.time.set_timer(
+            self.warning_spawn, int(9000))
+        
+        
         Font_color = (255, 87, 51)
         game_font = pygame.font.Font(None, 200)
         text_surf = game_font.render("DEFEAT", True, Font_color)
@@ -94,6 +102,20 @@ class Game:
                 # if event.type == pygame.MOUSEBUTTONDOWN:
                 #     if pygame.mouse.get_pressed()[0]:
                 #         self.player.grabber.extend()
+                if event.type == self.warning_spawn:
+                    self.laser.get_pos()
+                    self.laser.show_warning = True
+                    pygame.time.set_timer(
+                        self.warning_timer, int(2000), 1)
+                if event.type == self.warning_timer:
+                    self.laser.show_warning = False
+                    self.laser.laser_go = True
+                    pygame.time.set_timer(
+                    self.laser_timer, int(2000),1 )
+                if event.type == self.laser_timer:
+                    self.laser.laser_go = False
+
+
 
             keys: pygame.key.ScancodeWrapper = pygame.key.get_pressed()
             if self.game_active:
@@ -130,26 +152,11 @@ class Game:
                 if self.player.check_kill_collision(self.laser.kill_rect) and self.laser.laser_go:
                     self.player.die()
 
-                self.warning_clock += 1
-                if self.warning_clock % 300 == 0:
-                    self.laser.get_pos()
-                    self.laser.show_warning = True
+                    
 
-                if self.laser.show_warning:
 
-                    self.laser.warning_timer += 1
-                    if self.laser.warning_timer >= 120:
-                        self.laser.show_warning = False
-                        self.laser.laser_go = True
-                        self.laser.warning_timer = 0
 
-                if self.laser.laser_go:
-
-                    self.laser.laser_go_timer += 1
-                    if self.laser.laser_go_timer >= 120:
-                        self.laser.laser_go = False
-                        self.warning_clock = 0
-                        self.laser.laser_go_timer = 0
+                
                 
 
                 self.laser.update(self.screen)
