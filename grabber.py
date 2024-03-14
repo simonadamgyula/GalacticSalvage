@@ -18,7 +18,7 @@ class Grabber:
         self.extension_speed: float = 5
         self.length: float = 0
 
-        self.image = pygame.image.load("img/grabber/placeholder.png").convert_alpha()
+        self.image: pygame.Surface = pygame.image.load("img/grabber/grabber_0.png").convert_alpha()
 
         self.max_length: int = self.image.get_height()
 
@@ -123,3 +123,7 @@ class Grabber:
         rotated_image_rect = rotated_image.get_rect(center=rotated_image_center)
 
         return rotated_image, rotated_image_rect
+
+    def update_length(self, length_num: int) -> None:
+        self.image = pygame.image.load(f"img/grabber/grabber_{length_num}.png").convert_alpha()
+        self.max_length = self.image.get_height()
