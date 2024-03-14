@@ -46,7 +46,7 @@ class Game:
         button_surf: pygame.Surface = pygame.Surface((100, 100))
         # button_surf.set_alpha(0)
         button_rect: pygame.Rect = pygame.Rect(50, 50, 100, 100)
-        button_surf: pygame.Surface = self.game_font_smaller.render("", True, "white")
+        button_surf: pygame.Surface = self.game_font_smaller.render("?", True, "white")
         button_text_rect: pygame.Rect = button_surf.get_rect(
             center=(button_surf.get_width() / 2, button_surf.get_height() / 2)
         )
@@ -65,6 +65,9 @@ class Game:
         text_surf = game_font.render("DEFEAT", True, Font_color)
         text_rect = text_surf.get_rect(center=(1600 / 2, 900 / 2))
 
+
+        button_surf.blit(button_surf, button_text_rect)
+
         while running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -73,8 +76,6 @@ class Game:
                     self.player.grabber.extend()
                     if button_rect.collidepoint(pygame.mouse.get_pos()):
                         screen_note = not screen_note
-                    else:
-                        pygame.draw.rect(button_surf, (0, 0, 0), (0, 0, 200, 200))
                 if event.type == self.meteor_spawn_event:
                     Meteorite.create_random(self.screen_resolution)
                 if event.type == self.debris_spawn_event:
@@ -113,12 +114,12 @@ class Game:
                 self.player.draw(self.screen)
 
             else:
-                self.screen.fill("green")
+                self.screen.fill("red")
                 if keys[pygame.K_SPACE]:
                     self.game_active = True
 
-                button_surf.blit(button_surf, button_text_rect)
                 self.screen.blit(button_surf, button_rect)
+
                 if screen_note:
                     pygame.draw.rect(
                         self.screen, "white", (300, 200, 1000, 500), border_radius=50
