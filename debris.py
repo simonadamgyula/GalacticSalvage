@@ -1,11 +1,12 @@
-import pygame
+import typing
 import random
+import pygame
 
 from meteorite import Meteorite
 
 
 class Debris(pygame.sprite.Sprite):
-    debris_group: pygame.sprite.Group = pygame.sprite.Group()
+    debris_group: pygame.sprite.Group = pygame.sprite.Group()  # type: ignore
 
     def __init__(self, pos: pygame.Vector2, direction: float, speed: float) -> None:
         super().__init__()
@@ -18,10 +19,17 @@ class Debris(pygame.sprite.Sprite):
         self.rotation: float = 0
 
         self.image: pygame.Surface = pygame.image.load("./img/debris/satellite.png")
+        self.image2: pygame.Surface = pygame.image.load("./img/debris/lilcupship.png")
+        self.image3: pygame.Surface = pygame.image.load("./img/debris/sadwalle.png")
+
+        self.images = [self.image, self.image2, self.image3]
+
+        random_num: int = random.randint(0,2)
+        self.image = self.images[random_num]
 
         self.caught: bool = False
 
-    def update(self, *args, **kwargs) -> None:
+    def update(self, *args: typing.Any, **kwargs: typing.Any) -> None:
         screen: pygame.Surface = kwargs["screen"]
 
         self.rotate()
@@ -59,4 +67,4 @@ class Debris(pygame.sprite.Sprite):
         direction: float = Meteorite.create_random_direction(screen_resolution, position)
         speed: float = random.random() * 2 + 1
 
-        Debris.debris_group.add(Debris(position, direction, speed))
+        Debris.debris_group.add(Debris(position, direction, speed))  # type: ignore

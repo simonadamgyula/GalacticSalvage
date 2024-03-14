@@ -1,11 +1,12 @@
 import math
 import random
+import typing
 
 import pygame
 
 
 class Meteorite(pygame.sprite.Sprite):
-    meteorites: pygame.sprite.Group = pygame.sprite.Group()
+    meteorites: pygame.sprite.Group = pygame.sprite.Group()  # type: ignore
 
     def __init__(self, pos: pygame.Vector2, direction: float, speed: float, radius: int) -> None:
         super().__init__()
@@ -21,7 +22,7 @@ class Meteorite(pygame.sprite.Sprite):
         self.image: pygame.Surface = pygame.image.load("img/meteorite/meteorite.png").convert_alpha()
         self.image = pygame.transform.scale(self.image, (radius * 2, radius * 2))
 
-    def update(self, *args, **kwargs) -> None:
+    def update(self, *args: typing.Any, **kwargs: typing.Any) -> None:
         screen: pygame.Surface = kwargs["screen"]
 
         self.move()
@@ -55,7 +56,7 @@ class Meteorite(pygame.sprite.Sprite):
         direction: float = Meteorite.create_random_direction(screen_resolution, position)
         speed: float = random.random() * 2 + 1
 
-        Meteorite.meteorites.add(Meteorite(position, direction, speed, radius))
+        Meteorite.meteorites.add(Meteorite(position, direction, speed, radius))  # type: ignore
 
     @staticmethod
     def create_random_direction(screen_resolution: tuple[int, int], position: pygame.Vector2) -> float:

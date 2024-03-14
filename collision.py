@@ -10,7 +10,7 @@ class Collision:
     @staticmethod
     def rectangle_circle_collision(rect_center: pygame.Vector2, verticies: list[pygame.Vector2],
                                    circle_center: pygame.Vector2, radius: float) -> bool:
-        closest_point: pygame.Vector2 = Collision.intersection_of_segment_rect(verticies,
+        closest_point: pygame.Vector2 | None = Collision.intersection_of_segment_rect(verticies,
                                                                                (rect_center, circle_center))
 
         if not closest_point:
@@ -19,7 +19,7 @@ class Collision:
 
     @staticmethod
     def intersection_of_segment_rect(verticies: list[pygame.Vector2], segment: tuple[pygame.Vector2, pygame.Vector2]) \
-            -> pygame.Vector2:
+            -> pygame.Vector2 | None:
         for i in range(len(verticies)):
             intersection: None | pygame.Vector2 = \
                 Collision.intersection_of_linesegments(segment, (verticies[i], verticies[i - 1]))
