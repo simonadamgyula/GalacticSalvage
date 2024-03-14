@@ -1,15 +1,12 @@
 import math
-import pygame
 from enum import Enum
+import pygame
 
 from collision import Collision
 from debris import Debris
 
-
-class ExtensionStage(Enum):
-    STOPPED: int = 0
-    EXTENDING: int = 1
-    RETRACTING: int = 2
+    
+ExtensionStage = Enum("ExtensionStage", ["STOPPED", "EXTENDING", "RETRACTING"])
 
 
 class Grabber:
@@ -17,31 +14,32 @@ class Grabber:
         self.position: pygame.Vector2 = position
         self.direction: float = 0
 
-        self.extension_stage: ExtensionStage = ExtensionStage.STOPPED
-        self.extension_speed: int = 5
-        self.length: int = 0
+        self.extension_stage: ExtensionStage = ExtensionStage["STOPPED"]
+        self.extension_speed: float = 5
+        self.length: float = 0
 
         self.image = pygame.image.load("img/grabber/placeholder.png").convert_alpha()
 
         self.max_length: int = self.image.get_height()
 
         self.caught_debris: list[Debris] = []
-        self.points = 0
 
     def extend(self) -> None:
-        if self.extension_stage != ExtensionStage.STOPPED:
+        if self.extension_stage != ExtensionStage["STOPPED"]:
             return
 
         self.rotate()
-        self.extension_stage = ExtensionStage.EXTENDING
+        self.extension_stage = ExtensionStage["EXTENDING"]
 
-    def update(self, position: pygame.Vector2) -> None:
+    def update(self, position: pygame.Vector2) -> int:
         self.move(position)
         self.extension()
 
         self.drag_debris()
         if self.length == 0:
-            self.collect_debris()
+            return self.collect_debris()
+        else:
+            return 0
 
     def move(self, position: pygame.Vector2) -> None:
         self.position = position
@@ -54,30 +52,33 @@ class Grabber:
         for debris in self.caught_debris:
             debris.snap(end_position)
 
-    def collect_debris(self) -> None:
+    def collect_debris(self) -> int:
+        points: int = len(self.caught_debris)
+
         for debris in self.caught_debris:
             debris.kill()
-            self.points += 1
         self.caught_debris = []
 
+        return points
+
     def extension(self) -> None:
-        if self.extension_stage == ExtensionStage.STOPPED:
+        if self.extension_stage == ExtensionStage["STOPPED"]:
             return
 
-        if self.extension_stage == ExtensionStage.EXTENDING:
+        if self.extension_stage == ExtensionStage["EXTENDING"]:
             self.length += self.extension_speed
-        elif self.extension_stage == ExtensionStage.RETRACTING:
+        elif self.extension_stage == ExtensionStage["RETRACTING"]:
             self.length -= self.extension_speed
 
         if self.length < 0:
             self.length = 0
-            self.extension_stage = ExtensionStage.STOPPED
+            self.extension_stage = ExtensionStage["STOPPED"]
         if self.length > self.max_length:
             self.length = self.max_length
-            self.extension_stage = ExtensionStage.RETRACTING
+            self.extension_stage = ExtensionStage["RETRACTING"]
 
-    def check_collect(self, debris_list: list[Debris], screen) -> None:
-        if self.extension_stage == ExtensionStage.STOPPED:
+    def check_collect(self, debris_list: list[Debris]) -> None:
+        if self.extension_stage == ExtensionStage["STOPPED"]:
             return
 
         hitbox_position: pygame.Vector2 = self.get_hitbox_position()
@@ -104,7 +105,7 @@ class Grabber:
     def get_hitbox_position(self) -> pygame.Vector2:
         return pygame.Vector2(0, self.length).rotate(-self.direction) + self.position
 
-    def chop_image(self, height: int) -> pygame.Surface:
+    def chop_image(self, height: float) -> pygame.Surface:
         chop_rect: pygame.Rect = pygame.Rect(0, height, self.image.get_width(), self.image.get_height() - height)
         chopped_image: pygame.Surface = self.image.subsurface(chop_rect)
 
@@ -122,4 +123,3 @@ class Grabber:
         rotated_image_rect = rotated_image.get_rect(center=rotated_image_center)
 
         return rotated_image, rotated_image_rect
-    
