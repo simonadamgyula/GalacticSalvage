@@ -64,10 +64,11 @@ class Text:
 
 
 class Counter:
-    def __init__(self, font: pygame.font.Font,
+    def __init__(self, font: pygame.font.Font, text: str,
                  color: tuple[int, int, int] | str, **position: tuple[int, int]) -> None:
         self.count: float = 0
 
+        self.text = text
         self.font: pygame.font.Font = font
         self.color: tuple[int, int, int] | str = color
         self.position: dict[str, tuple[int, int]] = position
@@ -77,7 +78,7 @@ class Counter:
 
     def update(self, count: float) -> None:
         self.count = count
-        self.surface = self.font.render(str(self.count), True, self.color)
+        self.surface = self.font.render(self.text + str(self.count), True, self.color)
         self.rect = self.surface.get_rect(**self.position)
 
     def draw(self, screen: pygame.Surface) -> None:
