@@ -23,6 +23,7 @@ class Game:
         self.game_font = pygame.font.Font("font/Beyonders-6YoJM.ttf", 80)
         self.game_font_smaller = pygame.font.Font("font/Beyonders-6YoJM.ttf", 40)
         self.other_font = pygame.font.Font("font/ninifont-caps.otf", 50)
+        self.font_color = pygame.Color(255, 87, 51)
 
         self.meteorite_spawn_rate: float = 0.5  # hány darab keletkezzen másodpercenként
         self.meteor_spawn_event: int = pygame.event.custom_type()
@@ -60,10 +61,9 @@ class Game:
         pygame.time.set_timer(
             self.debris_spawn_event, int(1000 / self.debris_spawn_rate)
         )
-        Font_color = (255, 87, 51)
-        game_font = pygame.font.Font(None, 200)
-        text_surf = game_font.render("DEFEAT", True, Font_color)
-        text_rect = text_surf.get_rect(center=(1600 / 2, 900 / 2))
+
+        text_surf : pygame.Surface = self.game_font.render("Meghaltál!", True, self.font_color)
+        text_rect : pygame.Rect = text_surf.get_rect(center=(1600 / 2, 900 / 2))
 
 
         button_surf.blit(button_surf, button_text_rect)
@@ -92,8 +92,8 @@ class Game:
                     self.player.accelerate()
 
                 self.screen.blit(bg_surf, (0, 0))
-                text_points = game_font.render(
-                    f"{self.player.grabber.points}", 1, Font_color
+                text_points = self.game_font_smaller.render(
+                    f"Pontszámod: {self.player.grabber.points}", 1, self.font_color
                 )
                 self.screen.blit(text_points, (20, 20))
                 Meteorite.meteorites.update(screen=self.screen)
@@ -114,7 +114,7 @@ class Game:
                 self.player.draw(self.screen)
 
             else:
-                self.screen.fill("red")
+                self.screen.fill("green")
                 if keys[pygame.K_SPACE]:
                     self.game_active = True
 
