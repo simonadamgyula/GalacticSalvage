@@ -4,7 +4,6 @@ from collections.abc import Callable
 
 import pygame
 
-from debris import Debris
 from laser import Laser
 from meteorite import Meteorite
 from player import Player
@@ -57,7 +56,6 @@ class Game:
         self.laser_timer: int = pygame.event.custom_type()
         self.warning_spawn: int = pygame.event.custom_type()
         self.warning_timer: int = pygame.event.custom_type()
-        
 
         self.current_points: int = 0
         self.points: int = 145
@@ -108,22 +106,18 @@ class Game:
         )
         screen_note: bool = False
 
-        running: bool = True
-
         pygame.time.set_timer(
             self.meteor_spawn_event, int(1000 / self.meteorite_spawn_rate)
         )
         pygame.time.set_timer(
             self.debris_spawn_event, int(1000 / self.debris_spawn_rate)
         )
-        
+
         pygame.time.set_timer(
             self.warning_spawn, int(9000))
-        
-        
-        Font_color = (255, 87, 51)
+
         game_font = pygame.font.Font(None, 200)
-        text_surf = game_font.render("DEFEAT", True, Font_color)
+        text_surf = game_font.render("DEFEAT", True, self.font_color)
 
         text_rect = text_surf.get_rect(center=(1600 / 2, 900 / 2))
 
@@ -151,7 +145,7 @@ class Game:
                                 self.player.load_upgrades(self.upgrade_manager.get_upgrade_values)
                 if self.game_state == GameState["IN_GAME"]:
                     if event.type == self.meteor_spawn_event:
-                    Meteorite.create_random(self.screen_resolution)
+                        Meteorite.create_random(self.screen_resolution)
                 if event.type == self.debris_spawn_event:
                     Debris.create_random(self.screen_resolution)
                 # if event.type == pygame.MOUSEBUTTONDOWN:
@@ -166,7 +160,7 @@ class Game:
                     self.laser.show_warning = False
                     self.laser.laser_go = True
                     pygame.time.set_timer(
-                    self.laser_timer, int(2000),1 )
+                        self.laser_timer, int(2000), 1)
                 if event.type == self.laser_timer:
                     self.laser.laser_go = False
                 if event.type == pygame.KEYDOWN:
@@ -207,7 +201,7 @@ class Game:
 
                 if self.player.check_kill_collision(self.laser.kill_rect) and self.laser.laser_go:
                     self.player.die()
-                 
+
                 self.laser.update(self.screen)
             elif self.game_state == GameState["MAIN_MENU"]:
                 self.screen.fill("black")
