@@ -186,12 +186,11 @@ class Game:
                 #     f"Pontszámod: {self.player.grabber.points}", 1, self.font_color
                 # )
                 # self.screen.blit(text_points, (20, 20))
-
-                self.in_game_counter.update(self.current_points)
-                self.in_game_counter.draw(self.screen)
-
+                
                 Meteorite.meteorites.update(screen=self.screen)  # type: ignore
                 Debris.debris_group.update(screen=self.screen)  # type: ignore
+
+
 
                 if self.player.dead:
                     self.screen.blit(text_surf, text_rect)
@@ -206,6 +205,9 @@ class Game:
 
                 if self.player.check_kill_collision(self.laser.kill_rect) and self.laser.laser_go:
                     self.player.die()
+                    
+                self.in_game_counter.update(self.current_points)
+                self.in_game_counter.draw(self.screen)
 
                 self.laser.update(self.screen)
             elif self.game_state == GameState["MAIN_MENU"]:
