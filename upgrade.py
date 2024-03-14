@@ -39,7 +39,7 @@ class UpgradeManager:
             "acceleration": [240, 315],
             "rotation speed": [310, 420],
             "can slow down": [240],
-            "grabber speed": [60, 100],
+            "grabber speed": [100, 150],
             "grabber length": [145, 187, 252, 301]
         }
         self.upgrade_values: dict[str, list[float | bool]] = {
