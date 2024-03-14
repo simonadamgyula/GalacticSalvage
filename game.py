@@ -4,6 +4,7 @@ from collections.abc import Callable
 
 import pygame
 
+from laser import Laser
 from meteorite import Meteorite
 from player import Player
 from debris import Debris
@@ -44,6 +45,17 @@ class Game:
         self.debris_spawn_rate: float = 0.2
         self.debris_spawn_event: int = pygame.event.custom_type()
         Debris.create_random(self.screen_resolution)
+        self.laser = Laser(
+            (
+                self.screen_resolution[0] - 50,
+                self.screen_resolution[1] + self.screen_resolution[1],
+            ),
+            self.screen,
+        )
+        self.laser_spawn: int = pygame.event.custom_type()
+        self.laser_timer: int = pygame.event.custom_type()
+        self.warning_spawn: int = pygame.event.custom_type()
+        self.warning_timer: int = pygame.event.custom_type()
 
         self.current_points: int = 0
         self.points: int = 145
@@ -89,14 +101,24 @@ class Game:
         button_rect: pygame.Rect = pygame.Rect(50, 50, 100, 100)
         button_text: pygame.Surface = self.game_font_smaller.render("?", True, "white")
         button_text_rect: pygame.Rect = button_text.get_rect(
-            center=(button_surf.get_width() / 2, button_surf.get_height() / 2))
+
+            center=(button_surf.get_width() / 2, button_surf.get_height() / 2)
+        )
         screen_note: bool = False
 
-        # in game
-        pygame.time.set_timer(self.meteor_spawn_event, int(1000 / self.meteorite_spawn_rate))
-        pygame.time.set_timer(self.debris_spawn_event, int(1000 / self.debris_spawn_rate))
-        font_color: tuple[int, int, int] = (255, 87, 51)
-        text_surf = self.counter_font.render('DEFEAT', True, font_color)
+        pygame.time.set_timer(
+            self.meteor_spawn_event, int(1000 / self.meteorite_spawn_rate)
+        )
+        pygame.time.set_timer(
+            self.debris_spawn_event, int(1000 / self.debris_spawn_rate)
+        )
+
+        pygame.time.set_timer(
+            self.warning_spawn, int(9000))
+
+        game_font = pygame.font.Font(None, 200)
+        text_surf = game_font.render("DEFEAT", True, self.font_color)
+
         text_rect = text_surf.get_rect(center=(1600 / 2, 900 / 2))
 
         running: bool = True
@@ -124,8 +146,23 @@ class Game:
                 if self.game_state == GameState["IN_GAME"]:
                     if event.type == self.meteor_spawn_event:
                         Meteorite.create_random(self.screen_resolution)
-                    if event.type == self.debris_spawn_event:
-                        Debris.create_random(self.screen_resolution)
+                if event.type == self.debris_spawn_event:
+                    Debris.create_random(self.screen_resolution)
+                # if event.type == pygame.MOUSEBUTTONDOWN:
+                #     if pygame.mouse.get_pressed()[0]:
+                #         self.player.grabber.extend()
+                if event.type == self.warning_spawn:
+                    self.laser.get_pos()
+                    self.laser.show_warning = True
+                    pygame.time.set_timer(
+                        self.warning_timer, int(2000), 1)
+                if event.type == self.warning_timer:
+                    self.laser.show_warning = False
+                    self.laser.laser_go = True
+                    pygame.time.set_timer(
+                        self.laser_timer, int(2000), 1)
+                if event.type == self.laser_timer:
+                    self.laser.laser_go = False
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_SPACE:
                         if self.game_state == GameState["MAIN_MENU"]:
@@ -157,10 +194,15 @@ class Game:
                 self.current_points += self.player.update() * self.point_multiplier
                 self.player.grabber.check_collect(Debris.debris_group.sprites())  # type: ignore
                 collision: bool = self.player.check_collision(Meteorite.meteorites.sprites())  # type: ignore
+
                 if collision:
                     self.player.die()
                 self.player.draw(self.screen)
 
+                if self.player.check_kill_collision(self.laser.kill_rect) and self.laser.laser_go:
+                    self.player.die()
+
+                self.laser.update(self.screen)
             elif self.game_state == GameState["MAIN_MENU"]:
                 self.screen.fill("black")
 
@@ -168,10 +210,13 @@ class Game:
                 self.screen.blit(button_surf, button_rect)
 
                 if screen_note:
-                    pygame.draw.rect(self.screen, "white", (300, 200, 1000, 500), border_radius=50)
+                    pygame.draw.rect(
+                        self.screen, "white", (300, 200, 1000, 500), border_radius=50
+                    )
                 else:
                     self.screen.blit(title_surf, title_rect)
                     self.screen.blit(run_surf, run_rect)
+
                     self.upgrade_button.draw(self.screen)
             elif self.game_state == GameState["UPGRADE_MENU"]:
                 self.screen.fill("blue")
