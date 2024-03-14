@@ -34,6 +34,7 @@ class Game:
         self.counter_font: pygame.font.Font = pygame.font.Font(None, 200)
         self.game_font: pygame.font.Font = pygame.font.Font("font/Beyonders-6YoJM.ttf", 80)
         self.game_font_smaller: pygame.font.Font = pygame.font.Font("font/Beyonders-6YoJM.ttf", 40)
+        self.score_font : pygame.font.Font = pygame.font.Font("font/Beyonders-6YoJM.ttf", 30)
         self.upgrade_button_font: pygame.font.Font = pygame.font.Font("font/Beyonders-6YoJM.ttf", 20)
         self.other_font = pygame.font.Font("font/ninifont-caps.otf", 50)
         self.font_color = pygame.Color(255, 87, 51)
@@ -67,8 +68,8 @@ class Game:
         self.back_button: Button = Button((100, 100), "Back", self.upgrade_button_font,
                                           (63, 63, 63), "white", lambda: self.set_game_state(GameState["MAIN_MENU"]),
                                           lambda: self.game_state == GameState["UPGRADE_MENU"], center=(100, 100))
-        self.point_counter: Counter = Counter(self.counter_font, (255, 87, 51), center=(300, 100))
-        self.in_game_counter: Counter = Counter(self.counter_font, (255, 87, 51), topleft=(20, 20))
+        self.point_counter: Counter = Counter(self.game_font_smaller, "", (255, 255, 255), center=(300, 100))
+        self.in_game_counter: Counter = Counter(self.score_font, "Jelenlegi pontszámod: ", (255, 255, 255), topleft=(20, 20))
 
         self.upgrade_cards: list[UpgradeCard] = []
         self.new_upgrades()
@@ -86,7 +87,6 @@ class Game:
         run_rect: pygame.Rect = run_surf.get_rect(center=(800, 470))
 
         button_surf: pygame.Surface = pygame.Surface((100, 100))
-        # button_surf.set_alpha(0)
         button_rect: pygame.Rect = pygame.Rect(50, 50, 100, 100)
           
         button_text: pygame.Surface = self.game_font_smaller.render("?", True, "white")
@@ -101,8 +101,8 @@ class Game:
         text_surf : pygame.Surface = self.game_font.render("Meghaltál!", True, self.font_color)
         text_rect : pygame.Rect = text_surf.get_rect(center=(1600 / 2, 900 / 2))
         
-        text_surf = self.counter_font.render('DEFEAT', True, font_color)
-        text_rect = text_surf.get_rect(center=(1600 / 2, 900 / 2))
+
+        button_surf.blit(button_text, button_text_rect)
 
         running: bool = True
         while running:
@@ -113,8 +113,6 @@ class Game:
                     self.player.grabber.extend()
                     if button_rect.collidepoint(pygame.mouse.get_pos()) and self.game_state == GameState["MAIN_MENU"]:
                         screen_note = not screen_note
-                    else:
-                        pygame.draw.rect(button_surf, (0, 0, 0), (0, 0, 200, 200))
 
                     if self.upgrade_button.rect.collidepoint(pygame.mouse.get_pos()):
                         self.upgrade_button.click()
