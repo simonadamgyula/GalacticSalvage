@@ -56,7 +56,7 @@ class Game:
             # "rotation_speed": 2,aa
             # "can_slow_down": 1,
             # "grabber length": 4
-            "shield": 2
+            # "shield": 2
         })
         self.player.load_upgrades(self.upgrade_manager.get_upgrade_values)
 
@@ -195,6 +195,7 @@ class Game:
         Meteorite.meteorites.empty()
         Debris.debris_group.empty()
 
+        print(self.current_points)
         self.points += self.current_points
         self.current_points = 0
 
@@ -224,6 +225,7 @@ class Game:
     def try_buy(self, upgrade_name: str) -> None:
         cost: int = self.upgrade_manager.try_buy(upgrade_name, self.points)
         self.points -= cost
+        self.player.load_upgrades(self.upgrade_manager.get_upgrade_values)
 
     @staticmethod
     def background_generate():

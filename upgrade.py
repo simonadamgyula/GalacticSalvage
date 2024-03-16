@@ -43,7 +43,7 @@ class UpgradeManager:
             "can slow down": [240],
             "grabber speed": [100, 150],
             "grabber length": [145, 187, 252, 301],
-            "shield": [360, 530]
+            "shield": [160, 330]
         }
         self.upgrade_values: dict[str, list[float | bool]] = {
             "max velocity": [3, 3.3, 3.5, 3.8, 4.2],
