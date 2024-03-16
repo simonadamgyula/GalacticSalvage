@@ -171,11 +171,15 @@ class Player:
         self.dead = True
 
 
-    def check_kill_collision(self, kill_rect: pygame.Rect) -> bool:
+    def check_kill_collision(self, kill_rect: pygame.Rect,kill_rect_ver: pygame.Rect, direction: int) -> bool:
         vertices: list[pygame.Vector2] = self.get_verticies()
         for vertex in vertices:
-            if kill_rect.collidepoint(vertex.x, vertex.y):
-                return True
+            if direction == 1:
+                if kill_rect.collidepoint(vertex.x, vertex.y):
+                    return True
+            else:
+                if kill_rect_ver.collidepoint(vertex.x, vertex.y):
+                    return True
         return False
 
     def load_upgrades(self, upgrades: dict[str, float | bool]) -> None:

@@ -12,7 +12,7 @@ class Laser(pygame.sprite.Sprite):
         self.pos2 = (1600 - pos[0], pos[1])
         self.pos_ver = pos
         self.pos2_ver = (pos[0], 900 - self.pos_ver[1])
-        self.direction = 1
+        self.direction: int = 1
         self.random_color = 1
         self.colors = (
             # piros
@@ -52,14 +52,24 @@ class Laser(pygame.sprite.Sprite):
         self.show_warning = False
         self.laser_go = False
         self.kill_rect = pygame.Rect((0, self.pos[1], 1600, 90))
+        self.kill_rect_ver = pygame.Rect((self.pos_ver[0] - 10, 0, 70, 900))
+        self.two_laser = False
+        self.all_laser = 0
+
 
     def update(self, screen: pygame.Surface) -> None:
-        if self.direction == 1:
+        if self.two_laser:
             self.draw_laser(screen)
-            self.draw_warning(screen)
-        else:
+            self.draw_warning(screen)  
             self.draw_laser_ver(screen)
             self.draw_warning_ver(screen)
+        else:
+            if self.direction == 1:
+                self.draw_laser(screen)
+                self.draw_warning(screen)            
+            else:
+                self.draw_laser_ver(screen)
+                self.draw_warning_ver(screen)
 
     def draw_warning(self, screen: pygame.Surface) -> None:
         if self.show_warning:
@@ -95,7 +105,7 @@ class Laser(pygame.sprite.Sprite):
                 screen.blit(surface, (pos, 0))
                 pos += 5
                 width -= 10
-        self.kill_rect = pygame.Rect((self.pos_ver[0] - 10, 0, 70, 900))
+        self.kill_rect_ver = pygame.Rect((self.pos_ver[0] - 10, 0, 70, 900))
 
     def get_pos(self) -> None:
         self.direction: int = random.randint(1, 2)
