@@ -64,6 +64,8 @@ class Laser(pygame.sprite.Sprite):
         self.two_laser: bool = False
         self.all_laser: int = 0
 
+        self.enabled: bool = False
+
 
     def update(self, screen: pygame.Surface) -> None:
         if self.two_laser:
@@ -126,3 +128,6 @@ class Laser(pygame.sprite.Sprite):
             random_num: int = random.randint(100, 1500)
             self.pos_ver: Tuple[int,int] = (random_num, 25)
             self.pos2_ver: Tuple[int,int] = (random_num, 775)
+
+    
+

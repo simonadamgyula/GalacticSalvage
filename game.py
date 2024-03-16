@@ -66,6 +66,8 @@ class Game:
         self.laser_timer: int = pygame.event.custom_type()
         self.warning_spawn: int = pygame.event.custom_type()
         self.warning_timer: int = pygame.event.custom_type()
+        self.laser_back: int = pygame.event.custom_type()
+        self.can_count_laser: bool = True
         # ----------------------------------------------------
         self.current_points: int = 0
         self.points: int = 145
@@ -102,6 +104,15 @@ class Game:
             lambda: self.set_game_state(GameState["MAIN_MENU"]),
             lambda: self.game_state == GameState["UPGRADE_MENU"],
             center=(100, 100),
+        )
+        self.laser_button: Button = Button(
+            (500, 100),
+            "Lézer",
+            self.score_font,
+            (0, 0, 0),
+            "white",
+            lambda: self.game_state == GameState["MAIN_MENU"],
+            center=(1400, 50),
         )
         self.point_counter: Counter = Counter(
             self.game_font_smaller, "", (255, 255, 255), center=(300, 100)
@@ -140,8 +151,7 @@ class Game:
         pygame.time.set_timer(
             self.debris_spawn_event, int(1000 / self.debris_spawn_rate)
         )
-
-        pygame.time.set_timer(self.warning_spawn, int(9000)) # első lézer 9sec
+        pygame.time.set_timer(self.warning_spawn, int(9000))  # első lézer 9sec
 
         text_surf: pygame.Surface = self.game_font.render(
             "Meghaltál!", True, self.font_color
@@ -167,7 +177,8 @@ class Game:
                         self.upgrade_button.click()
                     if self.back_button.rect.collidepoint(pygame.mouse.get_pos()):
                         self.back_button.click()
-
+                    if self.laser_button.rect.collidepoint(pygame.mouse.get_pos()):
+                        self.toggle_laser()
                     for card in self.upgrade_cards:
                         if card.button.rect.collidepoint(pygame.mouse.get_pos()):
                             success: bool = card.button.click()
@@ -184,20 +195,21 @@ class Game:
                 #     if pygame.mouse.get_pressed()[0]:
                 #         self.player.grabber.extend()
                 # Lézer működése
-                if self.laser.all_laser >= 10:
-                    self.laser.two_laser = True
-                if event.type == self.warning_spawn:
-                    self.laser.get_pos()
-                    self.laser.show_warning = True
-                    pygame.time.set_timer(self.warning_timer, int(2000), 1)
-                if event.type == self.warning_timer:
-                    self.laser.show_warning = False
-                    self.laser.laser_go = True
-                    pygame.time.set_timer(self.laser_timer, int(2000), 1)
-                if event.type == self.laser_timer:
-                    self.laser.laser_go = False
-                    self.laser.all_laser += 1
-                #------------------------------------------------
+                if self.laser.enabled:
+                    if self.laser.all_laser >= 10:
+                        self.laser.two_laser = True
+                    if event.type == self.warning_spawn:
+                        self.laser.get_pos()
+                        self.laser.show_warning = True
+                        pygame.time.set_timer(self.warning_timer, int(2000), 1)
+                    if event.type == self.warning_timer:
+                        self.laser.show_warning = False
+                        self.laser.laser_go = True
+                        pygame.time.set_timer(self.laser_timer, int(700), 1)
+                    if event.type == self.laser_timer:
+                        self.laser.laser_go = False
+                        self.laser.all_laser += 1
+                # ------------------------------------------------
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_SPACE:
                         if self.game_state == GameState["MAIN_MENU"]:
@@ -256,7 +268,6 @@ class Game:
                 self.laser.update(self.screen)
             elif self.game_state == GameState["MAIN_MENU"]:
                 self.screen.fill("black")
-
                 self.screen.blit(button_surf, button_rect)
 
                 if screen_note:
@@ -268,6 +279,7 @@ class Game:
                     self.screen.blit(run_surf, run_rect)
 
                     self.upgrade_button.draw(self.screen)
+                    self.laser_button.draw(self.screen)
             elif self.game_state == GameState["UPGRADE_MENU"]:
                 self.screen.fill("blue")
 
@@ -291,7 +303,10 @@ class Game:
 
         self.points += self.current_points
         self.current_points = 0
+
         self.laser.all_laser = 0
+        pygame.time.set_timer(self.warning_spawn, 0)
+        pygame.time.set_timer(self.warning_spawn, int(9000))
 
     def set_game_state(self, state: GameState) -> None:
         self.game_state = state
@@ -342,3 +357,11 @@ class Game:
     def background_generate():
         bg_surf = pygame.image.load("img/background/space.png").convert_alpha()
         return bg_surf
+
+    def toggle_laser(self):
+        self.laser.enabled = not self.laser.enabled
+        if self.laser.enabled:
+            self.laser_button.bg_color = (70, 150, 110)
+        else:
+            self.laser_button.bg_color = (0, 0, 0)
+        print("egr")
