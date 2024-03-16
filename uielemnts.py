@@ -4,17 +4,12 @@ from collections.abc import Callable
 import pygame
 
 
-def log(*, center: typing.Any) -> None:
-    print(center)
-
-
 class Button:
     def __init__(self, size: tuple[int, int], text: str, font: pygame.font.Font, bg_color: tuple[int, int, int] | str,
                  font_color: tuple[int, int, int] | str, function: Callable[[], typing.Any],
                  active: Callable[[], bool] = lambda: True, usage: int = -1,
                  disabled_color: tuple[int, int, int] | str = "gray", **position: tuple[int, int]) -> None:
         self.surface: pygame.Surface = pygame.Surface(size, pygame.SRCALPHA, 32).convert_alpha()
-        log(**position)
         self.rect: pygame.Rect = self.surface.get_rect(**position)
         self.text: pygame.Surface = font.render(text, True, font_color)
         self.text_rect: pygame.Rect = self.text.get_rect(
