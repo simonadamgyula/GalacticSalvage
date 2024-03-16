@@ -54,7 +54,8 @@ class Game:
         self.debris_spawn_rate: float = 0.2
         self.debris_spawn_event: int = pygame.event.custom_type()
         Debris.create_random(self.screen_resolution)
-        self.laser = Laser(
+        # Lézerrel kapcsolatos dolgok
+        self.laser: Laser = Laser(
             (
                 self.screen_resolution[0] - 50,
                 self.screen_resolution[1] + self.screen_resolution[1],
@@ -65,7 +66,7 @@ class Game:
         self.laser_timer: int = pygame.event.custom_type()
         self.warning_spawn: int = pygame.event.custom_type()
         self.warning_timer: int = pygame.event.custom_type()
-
+        # ----------------------------------------------------
         self.current_points: int = 0
         self.points: int = 145
         self.point_multiplier: int = 10
@@ -140,7 +141,7 @@ class Game:
             self.debris_spawn_event, int(1000 / self.debris_spawn_rate)
         )
 
-        pygame.time.set_timer(self.warning_spawn, int(9000))
+        pygame.time.set_timer(self.warning_spawn, int(9000)) # első lézer 9sec
 
         text_surf: pygame.Surface = self.game_font.render(
             "Meghaltál!", True, self.font_color
@@ -182,6 +183,7 @@ class Game:
                 # if event.type == pygame.MOUSEBUTTONDOWN:
                 #     if pygame.mouse.get_pressed()[0]:
                 #         self.player.grabber.extend()
+                # Lézer működése
                 if self.laser.all_laser >= 10:
                     self.laser.two_laser = True
                 if event.type == self.warning_spawn:
@@ -195,7 +197,7 @@ class Game:
                 if event.type == self.laser_timer:
                     self.laser.laser_go = False
                     self.laser.all_laser += 1
-
+                #------------------------------------------------
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_SPACE:
                         if self.game_state == GameState["MAIN_MENU"]:
