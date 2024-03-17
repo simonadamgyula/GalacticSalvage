@@ -5,9 +5,11 @@ import pygame
 
 
 class Button:
-    def __init__(self, size: tuple[int, int], text: str, font: pygame.font.Font, bg_color: tuple[int, int, int] | str,
-                 font_color: tuple[int, int, int] | str, function: Callable[[], typing.Any],
-                 active: Callable[[], bool] = lambda: True, usage: int = -1,
+    buttons: list["Button"] = []
+
+    def __init__(self, size: tuple[int, int], text: str, font: pygame.font.Font,
+                 bg_color: tuple[int, int, int] | str | None, font_color: tuple[int, int, int] | str,
+                 function: Callable[[], typing.Any], active: Callable[[], bool] = lambda: True, usage: int = -1,
                  disabled_color: tuple[int, int, int] | str = "gray", **position: tuple[int, int]) -> None:
         self.surface: pygame.Surface = pygame.Surface(size, pygame.SRCALPHA, 32).convert_alpha()
         self.rect: pygame.Rect = self.surface.get_rect(**position)
@@ -15,7 +17,7 @@ class Button:
         self.text_rect: pygame.Rect = self.text.get_rect(
             center=(self.surface.get_width() / 2, self.surface.get_height() / 2))
 
-        self.bg_color: tuple[int, int, int] | str = bg_color
+        self.bg_color: tuple[int, int, int] | str | None = bg_color
         self.disabled_color: tuple[int, int, int] | str = disabled_color
 
         self.usage: int = usage
@@ -23,8 +25,11 @@ class Button:
         self.function: Callable[[], typing.Any] = function
         self.active: Callable[[], bool] = active
 
+        Button.buttons.append(self)
+
     def draw(self, screen: pygame.Surface) -> None:
-        self.surface.fill(self.bg_color if (self.usage != 0 and self.active()) else self.disabled_color)
+        if self.bg_color is not None:
+            self.surface.fill(self.bg_color if (self.usage != 0 and self.active()) else self.disabled_color)
         self.surface.blit(self.text, self.text_rect)
         screen.blit(self.surface, self.rect)
 
@@ -35,6 +40,13 @@ class Button:
 
         if self.active():
             return self.function()
+
+    @staticmethod
+    def handle_clicks() -> None:
+        mouse_pos: tuple[int, int] = pygame.mouse.get_pos()
+        for button in Button.buttons:
+            if button.rect.collidepoint(mouse_pos):
+                button.click()
 
 
 class Image:

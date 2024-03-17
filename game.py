@@ -85,9 +85,21 @@ class Game:
 
         self.player.load_upgrades(self.upgrade_manager.get_upgrade_values)
 
+        self.screen_note: bool = False
+        self.help_button: Button = Button(
+            (100, 100),
+            "?",
+            self.game_font_smaller,
+            None,
+            "white",
+            lambda: self.toggle_screen_note(),
+            lambda: self.game_state == GameState["MAIN_MENU"],
+            center=(100, 100),
+        )
+
         self.upgrade_button: Button = Button(
             (200, 100),
-            "Upgrade",
+            "upgrade",
             self.upgrade_button_font,
             (63, 63, 63),
             "white",
@@ -97,7 +109,7 @@ class Game:
         )
         self.back_button: Button = Button(
             (100, 100),
-            "Back",
+            "back",
             self.upgrade_button_font,
             (63, 63, 63),
             "white",
@@ -107,10 +119,11 @@ class Game:
         )
         self.laser_button: Button = Button(
             (500, 100),
-            "Lézer",
+            "lézer",
             self.score_font,
             (0, 0, 0),
             "white",
+            lambda: self.toggle_laser(),
             lambda: self.game_state == GameState["MAIN_MENU"],
             center=(1400, 50),
         )
@@ -136,14 +149,14 @@ class Game:
         )
         run_rect: pygame.Rect = run_surf.get_rect(center=(800, 470))
 
-        button_surf: pygame.Surface = pygame.Surface((100, 100))
-        button_rect: pygame.Rect = pygame.Rect(50, 50, 100, 100)
-
-        button_text: pygame.Surface = self.game_font_smaller.render("?", True, "white")
-        button_text_rect: pygame.Rect = button_text.get_rect(
-            center=(button_surf.get_width() / 2, button_surf.get_height() / 2)
-        )
-        screen_note: bool = False
+        # button_surf: pygame.Surface = pygame.Surface((100, 100))
+        # button_rect: pygame.Rect = pygame.Rect(50, 50, 100, 100)
+        #
+        # button_text: pygame.Surface = self.game_font_smaller.render("?", True, "white")
+        # button_text_rect: pygame.Rect = button_text.get_rect(
+        #     center=(button_surf.get_width() / 2, button_surf.get_height() / 2)
+        # )
+        # screen_note: bool = False
 
         pygame.time.set_timer(
             self.meteor_spawn_event, int(1000 / self.meteorite_spawn_rate)
@@ -158,8 +171,6 @@ class Game:
         )
         text_rect: pygame.Rect = text_surf.get_rect(center=(1600 / 2, 900 / 2))
 
-        button_surf.blit(button_text, button_text_rect)
-
         running: bool = True
         while running:
             for event in pygame.event.get():
@@ -167,25 +178,23 @@ class Game:
                     running = False
                 if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                     self.player.grabber.extend()
-                    if (
-                        button_rect.collidepoint(pygame.mouse.get_pos())
-                        and self.game_state == GameState["MAIN_MENU"]
-                    ):
-                        screen_note = not screen_note
+                    # if (
+                    #     button_rect.collidepoint(pygame.mouse.get_pos())
+                    #     and self.game_state == GameState["MAIN_MENU"]
+                    # ):
+                    #     screen_note = not screen_note
 
-                    if self.upgrade_button.rect.collidepoint(pygame.mouse.get_pos()):
-                        self.upgrade_button.click()
-                    if self.back_button.rect.collidepoint(pygame.mouse.get_pos()):
-                        self.back_button.click()
-                    if self.laser_button.rect.collidepoint(pygame.mouse.get_pos()):
-                        self.toggle_laser()
-                    for card in self.upgrade_cards:
-                        if card.button.rect.collidepoint(pygame.mouse.get_pos()):
-                            success: bool = card.button.click()
-                            if success:
-                                self.player.load_upgrades(
-                                    self.upgrade_manager.get_upgrade_values
-                                )
+                    Button.handle_clicks()
+
+                    # if self.upgrade_button.rect.collidepoint(pygame.mouse.get_pos()):
+                    #     self.upgrade_button.click()
+                    # if self.back_button.rect.collidepoint(pygame.mouse.get_pos()):
+                    #     self.back_button.click()
+                    # if self.laser_button.rect.collidepoint(pygame.mouse.get_pos()):
+                    #     self.toggle_laser()
+                    # for card in self.upgrade_cards:
+                    #     if card.button.rect.collidepoint(pygame.mouse.get_pos()):
+                    #         card.button.click()
                 if self.game_state == GameState["IN_GAME"]:
                     if event.type == self.meteor_spawn_event:
                         Meteorite.create_random(self.screen_resolution)
@@ -215,7 +224,7 @@ class Game:
                         if self.game_state == GameState["MAIN_MENU"]:
                             self.set_game_state(GameState["IN_GAME"])
                         elif (
-                            self.game_state == GameState["IN_GAME"] and self.player.dead
+                                self.game_state == GameState["IN_GAME"] and self.player.dead
                         ):
                             self.reset()
 
@@ -256,21 +265,22 @@ class Game:
                 self.player.draw(self.screen)
 
                 if (
-                    self.player.check_kill_collision(
-                        self.laser.kill_rect,
-                        self.laser.kill_rect_ver,
-                        self.laser.direction,
-                    )
-                    and self.laser.laser_go
+                        self.player.check_kill_collision(
+                            self.laser.kill_rect,
+                            self.laser.kill_rect_ver,
+                            self.laser.direction,
+                        )
+                        and self.laser.laser_go
                 ):
                     self.player.die()
 
                 self.laser.update(self.screen)
             elif self.game_state == GameState["MAIN_MENU"]:
                 self.screen.fill("black")
-                self.screen.blit(button_surf, button_rect)
+                self.help_button.draw(self.screen)
+                # self.screen.blit(button_surf, button_rect)
 
-                if screen_note:
+                if self.screen_note:
                     pygame.draw.rect(
                         self.screen, "white", (300, 200, 1000, 500), border_radius=50
                     )
@@ -312,6 +322,9 @@ class Game:
     def set_game_state(self, state: GameState) -> None:
         self.game_state = state
 
+    def toggle_screen_note(self) -> None:
+        self.screen_note = not self.screen_note
+
     def draw_upgrade_cards(self) -> None:
         for card in self.upgrade_cards:
             card.draw(self.screen)
@@ -343,7 +356,7 @@ class Game:
 
     # don't know why this is needed, but doesn't work without it
     def create_callables(
-        self, upgrade_name: str
+            self, upgrade_name: str
     ) -> tuple[Callable[[], typing.Any], Callable[[], bool]]:
         return (
             lambda: self.try_buy(upgrade_name),
