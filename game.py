@@ -1,3 +1,4 @@
+import json
 import typing
 from collections.abc import Callable
 from enum import Enum
@@ -73,15 +74,7 @@ class Game:
         self.points: int = 145
         self.point_multiplier: int = 10
 
-        self.upgrade_manager: UpgradeManager = UpgradeManager({
-            # "max_velocity": 4,
-            # "acceleration": 2,
-            # "grabber_speed": 2,w
-            # "rotation_speed": 2,aa
-            # "can_slow_down": 1,
-            # "grabber length": 4
-            # "shield": 2
-        })
+        self.upgrade_manager: UpgradeManager = UpgradeManager({})
 
         self.player.load_upgrades(self.upgrade_manager.get_upgrade_values)
 
@@ -136,6 +129,8 @@ class Game:
 
         self.upgrade_cards: list[UpgradeCard] = []
         self.new_upgrades()
+
+        self.load()
 
     def run(self) -> None:
         # main menu
@@ -302,6 +297,7 @@ class Game:
             pygame.display.update()
             self.clock.tick(60)
 
+        self.save()
         pygame.quit()
 
     def reset(self) -> None:
@@ -311,13 +307,14 @@ class Game:
         Meteorite.meteorites.empty()
         Debris.debris_group.empty()
 
-        print(self.current_points)
         self.points += self.current_points
         self.current_points = 0
 
         self.laser.all_laser = 0
         pygame.time.set_timer(self.warning_spawn, 0)
         pygame.time.set_timer(self.warning_spawn, int(9000))
+
+        self.save()
 
     def set_game_state(self, state: GameState) -> None:
         self.game_state = state
@@ -366,6 +363,7 @@ class Game:
     def try_buy(self, upgrade_name: str) -> None:
         cost: int = self.upgrade_manager.try_buy(upgrade_name, self.points)
         self.points -= cost
+        self.save()
         self.player.load_upgrades(self.upgrade_manager.get_upgrade_values)
 
     @staticmethod
@@ -379,4 +377,22 @@ class Game:
             self.laser_button.bg_color = (70, 150, 110)
         else:
             self.laser_button.bg_color = (0, 0, 0)
-        print("egr")
+
+    def save(self) -> None:
+        save_dict: dict[str, int | dict[str, int]] = {
+            "points": self.points,
+            "upgrades": self.upgrade_manager.upgrades
+        }
+        with open("saves.json", "w", encoding="utf-8") as file:
+            json.dump(save_dict, file)
+
+    def load(self) -> None:
+        try:
+            with open("saves.json", "r", encoding="utf-8") as file:
+                load_dict = json.load(file)
+        except FileNotFoundError:
+            return
+
+        self.points = load_dict.get("points", 0)
+        self.upgrade_manager = UpgradeManager(load_dict.get("upgrades", {}))
+        self.player.load_upgrades(self.upgrade_manager.get_upgrade_values)
