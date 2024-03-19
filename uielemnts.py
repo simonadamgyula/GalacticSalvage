@@ -3,7 +3,7 @@ import typing
 from collections.abc import Callable
 import pygame
 
-
+from sound import Sound
 class Button:
     buttons: list["Button"] = []
 
