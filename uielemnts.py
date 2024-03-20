@@ -61,7 +61,7 @@ class Image:
 
 
 class Text:
-    def __init__(self, text: str, font: pygame.font.Font,
+    def __init__(self, text: str, font: pygame.font.Font | pygame.freefont.Font,
                  color: tuple[int, int, int] | str, **position: tuple[int, int]) -> None:
         self.surface: pygame.Surface = font.render(text, True, color)
         self.rect: pygame.Rect = self.surface.get_rect(**position)
@@ -95,8 +95,9 @@ class Counter:
 class UpgradeCard:
     def __init__(self, size: tuple[int, int], text: str, price: int, font: pygame.font.Font,
                  image: str, color: tuple[int, int, int] | str, font_color: tuple[int, int, int] | str,
-                 function: Callable[[], typing.Any], active: Callable[[], bool],
-                 disabled_color: tuple[int, int, int] | str = "gray", **position: tuple[int, int]) -> None:
+                 function: Callable[[], typing.Any], active: Callable[[], bool], description: str,
+                 description_font: pygame.font.Font, disabled_color: tuple[int, int, int] | str = "gray",
+                 **position: tuple[int, int]) -> None:
         self.surface: pygame.Surface = pygame.Surface(size, pygame.SRCALPHA, 32).convert_alpha()
 
         position: tuple[int, int] = position.get("center", (0, 0))
@@ -104,12 +105,14 @@ class UpgradeCard:
         self.image: Image = Image(image, center=position)
         self.name: Text = Text(text, font, font_color, center=(position[0], position[1] + 100))
         self.price_text: Text = Text(f"Price: {price}", font, font_color, center=(position[0], position[1] + 200))
+        self.description: Text = Text(description, description_font, "white", center=(position[0], position[1] + 300))
         self.button: Button = Button((100, 50),
                                      "Buy", font, color, font_color, function, active=active,
-                                     usage=1, disabled_color=disabled_color, center=(position[0], position[1] + 300))
+                                     usage=1, disabled_color=disabled_color, center=(position[0], position[1] + 400))
 
     def draw(self, screen: pygame.Surface) -> None:
         self.image.draw(screen)
         self.name.draw(screen)
         self.price_text.draw(screen)
+        self.description.draw(screen)
         self.button.draw(screen)

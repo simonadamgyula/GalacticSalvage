@@ -45,6 +45,9 @@ class Game:
         self.upgrade_button_font: pygame.font.Font = pygame.font.Font(
             "font/Beyonders-6YoJM.ttf", 20
         )
+        self.font_10: pygame.font.Font = pygame.font.Font(
+            "font/ninifont-caps.otf", 25
+        )
         self.other_font = pygame.font.Font("font/ninifont-caps.otf", 50)
         self.font_color = pygame.Color(255, 87, 51)
 
@@ -336,10 +339,11 @@ class Game:
             callables: tuple[Callable[[], typing.Any], Callable[[], bool]] = (
                 self.create_callables(upgrade[0])
             )
+            upgrade_display: tuple[str, str] = self.upgrade_manager.upgrade_display[upgrade[0]]
             self.upgrade_cards.append(
                 UpgradeCard(
                     (200, 300),
-                    upgrade[0],
+                    upgrade_display[0],
                     upgrade[2],
                     self.upgrade_button_font,
                     "img/debris/satellite.png",
@@ -347,6 +351,8 @@ class Game:
                     "white",
                     callables[0],
                     callables[1],
+                    upgrade_display[1],
+                    self.font_10,
                     center=(400 * (index + 1), 400),
                 )
             )
