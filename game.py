@@ -144,15 +144,6 @@ class Game:
         )
         run_rect: pygame.Rect = run_surf.get_rect(center=(800, 470))
 
-        # button_surf: pygame.Surface = pygame.Surface((100, 100))
-        # button_rect: pygame.Rect = pygame.Rect(50, 50, 100, 100)
-        #
-        # button_text: pygame.Surface = self.game_font_smaller.render("?", True, "white")
-        # button_text_rect: pygame.Rect = button_text.get_rect(
-        #     center=(button_surf.get_width() / 2, button_surf.get_height() / 2)
-        # )
-        # screen_note: bool = False
-
         pygame.time.set_timer(
             self.meteor_spawn_event, int(1000 / self.meteorite_spawn_rate)
         )
@@ -173,32 +164,14 @@ class Game:
                     running = False
                 if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                     self.player.grabber.extend()
-                    # if (
-                    #     button_rect.collidepoint(pygame.mouse.get_pos())
-                    #     and self.game_state == GameState["MAIN_MENU"]
-                    # ):
-                    #     screen_note = not screen_note
-
                     Button.handle_clicks()
 
-                    # if self.upgrade_button.rect.collidepoint(pygame.mouse.get_pos()):
-                    #     self.upgrade_button.click()
-                    # if self.back_button.rect.collidepoint(pygame.mouse.get_pos()):
-                    #     self.back_button.click()
-                    # if self.laser_button.rect.collidepoint(pygame.mouse.get_pos()):
-                    #     self.toggle_laser()
-                    # for card in self.upgrade_cards:
-                    #     if card.button.rect.collidepoint(pygame.mouse.get_pos()):
-                    #         card.button.click()
                 if self.game_state == GameState["IN_GAME"]:
                     if event.type == self.meteor_spawn_event:
                         Meteorite.create_random(self.screen_resolution)
-                if event.type == self.debris_spawn_event:
-                    Debris.create_random(self.screen_resolution)
-                # if event.type == pygame.MOUSEBUTTONDOWN:
-                #     if pygame.mouse.get_pressed()[0]:
-                #         self.player.grabber.extend()
-                # Lézer működése
+                    if event.type == self.debris_spawn_event:
+                        Debris.create_random(self.screen_resolution)
+
                 if self.laser.enabled:
                     if self.laser.all_laser >= 10:
                         self.laser.two_laser = True
@@ -237,11 +210,6 @@ class Game:
 
                 self.screen.blit(bg_surf, (0, 0))
 
-                # text_points = self.game_font_smaller.render(
-                #     f"Pontszámod: {self.player.grabber.points}", 1, self.font_color
-                # )
-                # self.screen.blit(text_points, (20, 20))
-
                 self.in_game_counter.update(self.current_points)
                 self.in_game_counter.draw(self.screen)
 
@@ -273,7 +241,6 @@ class Game:
             elif self.game_state == GameState["MAIN_MENU"]:
                 self.screen.fill("black")
                 self.help_button.draw(self.screen)
-                # self.screen.blit(button_surf, button_rect)
 
                 if self.screen_note:
                     pygame.draw.rect(
