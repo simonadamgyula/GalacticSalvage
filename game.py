@@ -169,7 +169,7 @@ class Game:
         text_rect: pygame.Rect = text_surf.get_rect(center=(1600 / 2, 900 / 2))
 
         pygame.mixer.music.load(self.sound.all_music[self.sound.music_index])
-        pygame.mixer.music.set_volume(0.03)
+        pygame.mixer.music.set_volume(0.3)
         pygame.mixer.music.play(-1)
 
         running: bool = True
@@ -232,7 +232,7 @@ class Game:
                                 self.sound.all_music[self.sound.music_index]
                             )
                             pygame.mixer.music.play(-1)
-                            pygame.mixer.music.set_volume(0.1)
+                            pygame.mixer.music.set_volume(0.6)
                         elif (
                             self.game_state == GameState["IN_GAME"] and self.player.dead
                         ):
@@ -244,7 +244,7 @@ class Game:
                                 self.sound.all_music[self.sound.music_index]
                             )
                             pygame.mixer.music.play(-1)
-                            pygame.mixer.music.set_volume(0.03)
+                            pygame.mixer.music.set_volume(0.3)
                         # if self.game_state == GameState["MAIN_MENU"]:
                         #     pygame.mixer.music.stop()
                         #     self.sound.music_index += 1
