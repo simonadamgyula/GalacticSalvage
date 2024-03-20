@@ -161,7 +161,6 @@ class Game:
         pygame.time.set_timer(
             self.debris_spawn_event, int(1000 / self.debris_spawn_rate)
         )
-        pygame.time.set_timer(self.warning_spawn, int(9000))  # első lézer 9sec
 
         text_surf: pygame.Surface = self.game_font.render(
             "Meghaltál!", True, self.font_color
@@ -179,6 +178,8 @@ class Game:
                     running = False
                 if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                     self.player.grabber.extend()
+                    if self.game_state == GameState["IN_GAME"]:
+                        self.sound.extend_arm.play()
                     # if (
                     #     button_rect.collidepoint(pygame.mouse.get_pos())
                     #     and self.game_state == GameState["MAIN_MENU"]
@@ -186,7 +187,7 @@ class Game:
                     #     screen_note = not screen_note
 
                     Button.handle_clicks()
-                    
+
                     # if self.upgrade_button.rect.collidepoint(pygame.mouse.get_pos()):
                     #     self.upgrade_button.click()
                     # if self.back_button.rect.collidepoint(pygame.mouse.get_pos()):
@@ -211,6 +212,7 @@ class Game:
                     if event.type == self.warning_spawn:
                         self.laser.get_pos()
                         self.laser.show_warning = True
+                        self.sound.warning.play()
                         pygame.time.set_timer(self.warning_timer, int(2000), 1)
                     if event.type == self.warning_timer:
                         self.laser.show_warning = False
@@ -223,6 +225,9 @@ class Game:
                 # ------------------------------------------------
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_SPACE:
+                        pygame.time.set_timer(
+                            self.warning_spawn, int(9000)
+                        )  # első lézer 9sec
                         if self.game_state == GameState["MAIN_MENU"]:
                             self.set_game_state(GameState["IN_GAME"])
                             pygame.mixer.music.stop()
@@ -245,24 +250,6 @@ class Game:
                             )
                             pygame.mixer.music.play(-1)
                             pygame.mixer.music.set_volume(0.3)
-                        # if self.game_state == GameState["MAIN_MENU"]:
-                        #     pygame.mixer.music.stop()
-                        #     self.sound.music_index += 1
-                        #     self.sound.music_index_controll()
-                        #     pygame.mixer.music.load(
-                        #         self.sound.all_music[self.sound.music_index]
-                        #     )
-                        #     pygame.mixer.music.play(-1)
-                        #     pygame.mixer.music.set_volume(0.05)
-                        # else:
-                        #     pygame.mixer.music.stop()
-                        #     self.sound.music_index += 1
-                        #     self.sound.music_index_controll()
-                        #     pygame.mixer.music.load(
-                        #         self.sound.all_music[self.sound.music_index]
-                        #     )
-                        #     pygame.mixer.music.play(-1)
-                        #     pygame.mixer.music.set_volume(0.15)
 
             keys: pygame.key.ScancodeWrapper = pygame.key.get_pressed()
             if self.game_state == GameState["IN_GAME"]:

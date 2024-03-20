@@ -216,8 +216,9 @@ class Player:
         self.show_shield()
 
     def die(self) -> None:
-        self.dead = True
-        self.sound.explosion.play()
+        if not self.dead:
+            self.dead = True
+            self.sound.explosion.play()
 
     def check_kill_collision(
         self, kill_rect: pygame.Rect, kill_rect_ver: pygame.Rect, direction: int

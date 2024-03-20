@@ -55,6 +55,7 @@ class Button:
 
     def click(self) -> typing.Any:
         if self.usage == 0:
+            self.sound.wrong_button.play()
             return
         self.usage -= 1 if self.usage > 0 else 0
 

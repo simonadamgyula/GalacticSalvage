@@ -1,11 +1,12 @@
 import math
 from enum import Enum
+
 import pygame
 
 from collision import Collision
 from debris import Debris
+from sound import Sound
 
-    
 ExtensionStage = Enum("ExtensionStage", ["STOPPED", "EXTENDING", "RETRACTING"])
 
 
@@ -18,11 +19,15 @@ class Grabber:
         self.extension_speed: float = 5
         self.length: float = 0
 
-        self.image: pygame.Surface = pygame.image.load("img/grabber/grabber_0.png").convert_alpha()
+        self.image: pygame.Surface = pygame.image.load(
+            "img/grabber/grabber_0.png"
+        ).convert_alpha()
 
         self.max_length: int = self.image.get_height()
 
         self.caught_debris: list[Debris] = []
+
+        self.sound = Sound()
 
     def extend(self) -> None:
         if self.extension_stage != ExtensionStage["STOPPED"]:
@@ -84,15 +89,20 @@ class Grabber:
         hitbox_position: pygame.Vector2 = self.get_hitbox_position()
 
         for debris in debris_list:
-            if Collision.circle_circle_collision(hitbox_position, 20, debris.position, 10):
+            if Collision.circle_circle_collision(
+                hitbox_position, 20, debris.position, 10
+            ):
                 if debris.caught:
+                    self.sound.collect.play()
                     continue
                 self.caught_debris.append(debris)
                 debris.caught = True
 
     def rotate(self) -> None:
         mouse_pos: tuple[int, int] = pygame.mouse.get_pos()
-        mouse_vec: pygame.Vector2 = pygame.Vector2(mouse_pos[0] - self.position.x, mouse_pos[1] - self.position.y)
+        mouse_vec: pygame.Vector2 = pygame.Vector2(
+            mouse_pos[0] - self.position.x, mouse_pos[1] - self.position.y
+        )
 
         self.direction = math.degrees(math.atan2(mouse_vec.x, mouse_vec.y))
 
@@ -106,18 +116,27 @@ class Grabber:
         return pygame.Vector2(0, self.length).rotate(-self.direction) + self.position
 
     def chop_image(self, height: float) -> pygame.Surface:
-        chop_rect: pygame.Rect = pygame.Rect(0, height, self.image.get_width(), self.image.get_height() - height)
+        chop_rect: pygame.Rect = pygame.Rect(
+            0, height, self.image.get_width(), self.image.get_height() - height
+        )
         chopped_image: pygame.Surface = self.image.subsurface(chop_rect)
 
         return chopped_image
 
-    def get_rotated_image(self, image: pygame.Surface) -> tuple[pygame.Surface, pygame.Rect]:
+    def get_rotated_image(
+        self, image: pygame.Surface
+    ) -> tuple[pygame.Surface, pygame.Rect]:
         image_rect = image.get_rect(center=(self.position.x, self.position.y))
-        offset_center_to_pivot = pygame.math.Vector2(self.position) - image_rect.midbottom
+        offset_center_to_pivot = (
+            pygame.math.Vector2(self.position) - image_rect.midbottom
+        )
 
         rotated_offset = offset_center_to_pivot.rotate(-self.direction)
 
-        rotated_image_center = (self.position.x - rotated_offset.x, self.position.y - rotated_offset.y)
+        rotated_image_center = (
+            self.position.x - rotated_offset.x,
+            self.position.y - rotated_offset.y,
+        )
 
         rotated_image = pygame.transform.rotate(image, self.direction)
         rotated_image_rect = rotated_image.get_rect(center=rotated_image_center)
@@ -125,5 +144,7 @@ class Grabber:
         return rotated_image, rotated_image_rect
 
     def update_length(self, length_num: int) -> None:
-        self.image = pygame.image.load(f"img/grabber/grabber_{length_num}.png").convert_alpha()
+        self.image = pygame.image.load(
+            f"img/grabber/grabber_{length_num}.png"
+        ).convert_alpha()
         self.max_length = self.image.get_height()
