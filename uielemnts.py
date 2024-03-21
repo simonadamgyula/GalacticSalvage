@@ -3,19 +3,33 @@ import typing
 from collections.abc import Callable
 import pygame
 
+from sound import Sound
+
 
 class Button:
     buttons: list["Button"] = []
 
-    def __init__(self, size: tuple[int, int], text: str, font: pygame.font.Font,
-                 bg_color: tuple[int, int, int] | str | None, font_color: tuple[int, int, int] | str,
-                 function: Callable[[], typing.Any], active: Callable[[], bool] = lambda: True, usage: int = -1,
-                 disabled_color: tuple[int, int, int] | str = "gray", **position: tuple[int, int]) -> None:
-        self.surface: pygame.Surface = pygame.Surface(size, pygame.SRCALPHA, 32).convert_alpha()
+    def __init__(
+        self,
+        size: tuple[int, int],
+        text: str,
+        font: pygame.font.Font,
+        bg_color: tuple[int, int, int] | str | None,
+        font_color: tuple[int, int, int] | str,
+        function: Callable[[], typing.Any],
+        active: Callable[[], bool] = lambda: True,
+        usage: int = -1,
+        disabled_color: tuple[int, int, int] | str = "gray",
+        **position: tuple[int, int],
+    ) -> None:
+        self.surface: pygame.Surface = pygame.Surface(
+            size, pygame.SRCALPHA, 32
+        ).convert_alpha()
         self.rect: pygame.Rect = self.surface.get_rect(**position)
         self.text: pygame.Surface = font.render(text, True, font_color)
         self.text_rect: pygame.Rect = self.text.get_rect(
-            center=(self.surface.get_width() / 2, self.surface.get_height() / 2))
+            center=(self.surface.get_width() / 2, self.surface.get_height() / 2)
+        )
 
         self.bg_color: tuple[int, int, int] | str | None = bg_color
         self.disabled_color: tuple[int, int, int] | str = disabled_color
@@ -27,18 +41,26 @@ class Button:
 
         Button.buttons.append(self)
 
+        self.sound = Sound()
+
     def draw(self, screen: pygame.Surface) -> None:
         if self.bg_color is not None:
-            self.surface.fill(self.bg_color if (self.usage != 0 and self.active()) else self.disabled_color)
+            self.surface.fill(
+                self.bg_color
+                if (self.usage != 0 and self.active())
+                else self.disabled_color
+            )
         self.surface.blit(self.text, self.text_rect)
         screen.blit(self.surface, self.rect)
 
     def click(self) -> typing.Any:
         if self.usage == 0:
+            self.sound.wrong_button.play()
             return
         self.usage -= 1 if self.usage > 0 else 0
 
         if self.active():
+            self.sound.button.play()
             return self.function()
 
     @staticmethod
@@ -50,7 +72,12 @@ class Button:
 
 
 class Image:
-    def __init__(self, path: str, size: tuple[int, int] | None = None, **position: tuple[int, int]) -> None:
+    def __init__(
+        self,
+        path: str,
+        size: tuple[int, int] | None = None,
+        **position: tuple[int, int],
+    ) -> None:
         self.surface: pygame.Surface = pygame.image.load(path).convert_alpha()
         if size:
             self.surface = pygame.transform.scale(self.surface, size)
@@ -82,8 +109,13 @@ class Text:
 
 
 class Counter:
-    def __init__(self, font: pygame.font.Font, text: str,
-                 color: tuple[int, int, int] | str, **position: tuple[int, int]) -> None:
+    def __init__(
+        self,
+        font: pygame.font.Font,
+        text: str,
+        color: tuple[int, int, int] | str,
+        **position: tuple[int, int],
+    ) -> None:
         self.count: float = 0
 
         self.text = text

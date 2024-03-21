@@ -1,18 +1,22 @@
 import math
-import pygame
 from copy import copy
+
+import pygame
 
 from animation import Animation
 from collision import Collision
 from grabber import Grabber
 from meteorite import Meteorite
+from sound import Sound
 
 
 def clamp(value: float, min_: float, max_: float) -> float:
     return max(min(value, max_), min_)
 
 
-def map_value_to_range(value: float, start1: float, stop1: float, start2: float, stop2: float) -> float:
+def map_value_to_range(
+    value: float, start1: float, stop1: float, start2: float, stop2: float
+) -> float:
     range1: float = stop1 - start1
     range2: float = stop2 - start2
     difference: float = range1 / range2
@@ -44,13 +48,18 @@ class Player:
         self.images.append(pygame.image.load("img/spaceship/moving/4.png"))
         self.images.append(pygame.image.load("img/spaceship/moving/5.png"))
 
-        self.death_animation: Animation = Animation.import_spritesheet("img/explosion.png", 224, 224, 0.2, False)
+        self.death_animation: Animation = Animation.import_spritesheet(
+            "img/explosion.png", 224, 224, 0.2, False
+        )
 
-        self.shield_image: pygame.Surface = pygame.image.load("img/spaceship/shield/shield.png").convert_alpha()
+        self.shield_image: pygame.Surface = pygame.image.load(
+            "img/spaceship/shield/shield.png"
+        ).convert_alpha()
         self.shield_visibility_duration: float = 30  # in frames (60 frames per second)
         self.shield_visible: float = 0
-        self.shield_break_animation: Animation = Animation.import_spritesheet("img/spaceship/shield/shield_break.png",
-                                                                              132, 132, 0.2, False)
+        self.shield_break_animation: Animation = Animation.import_spritesheet(
+            "img/spaceship/shield/shield_break.png", 132, 132, 0.2, False
+        )
 
         self.frame_index = 0
         self.animation_speed: float = 0.3
@@ -69,6 +78,8 @@ class Player:
         self.last_meteorite_hit: Meteorite | None = None
 
         self.prev_call: float = 0
+
+        self.sound = Sound()
 
     @property
     def resolution(self) -> tuple[int, int]:
@@ -110,7 +121,9 @@ class Player:
         if self.shield_visible > 0:
             return
 
-        acceleration: pygame.Vector2 = pygame.Vector2(0, 1).rotate(-self.direction) * self.acceleration
+        acceleration: pygame.Vector2 = (
+            pygame.Vector2(0, 1).rotate(-self.direction) * self.acceleration
+        )
 
         self.velocity += acceleration
         self.velocity = self.velocity.clamp_magnitude(self.max_velocity)
@@ -174,7 +187,9 @@ class Player:
             ):
                 continue
 
-            if Collision.rectangle_circle_collision(self.position, verticies, meteorite.position, meteorite.radius):
+            if Collision.rectangle_circle_collision(
+                self.position, verticies, meteorite.position, meteorite.radius
+            ):
                 self.last_meteorite_hit = meteorite
                 return True
 
@@ -182,8 +197,10 @@ class Player:
 
     def out_screen(self) -> None:
         if (
-                self.position.x > 1600 or self.position.x < 0 or
-                self.position.y > 900 or self.position.y < 0
+            self.position.x > 1600
+            or self.position.x < 0
+            or self.position.y > 900
+            or self.position.y < 0
         ):
             self.die()
 
@@ -199,10 +216,13 @@ class Player:
         self.show_shield()
 
     def die(self) -> None:
-        self.dead = True
+        if not self.dead:
+            self.dead = True
+            self.sound.explosion.play()
 
-
-    def check_kill_collision(self, kill_rect: pygame.Rect,kill_rect_ver: pygame.Rect, direction: int) -> bool:
+    def check_kill_collision(
+        self, kill_rect: pygame.Rect, kill_rect_ver: pygame.Rect, direction: int
+    ) -> bool:
         vertices: list[pygame.Vector2] = self.get_verticies()
         for vertex in vertices:
             if direction == 1:
@@ -227,8 +247,12 @@ class Player:
         if self.last_meteorite_hit is None:
             return
 
-        surface_normal: pygame.Vector2 = -(self.position - meteorite.position).normalize()
-        self.velocity = surface_normal * max(self.velocity.magnitude(), self.max_velocity / 2)
+        surface_normal: pygame.Vector2 = -(
+            self.position - meteorite.position
+        ).normalize()
+        self.velocity = surface_normal * max(
+            self.velocity.magnitude(), self.max_velocity / 2
+        )
         self.position += self.velocity
 
     def show_shield(self) -> None:
@@ -244,8 +268,13 @@ class Player:
             self.shield_visible -= 1
             return
 
-        self.shield_image.set_alpha(int(map_value_to_range(self.shield_visible,
-                                                           0, 255, 0, self.shield_visibility_duration)))
+        self.shield_image.set_alpha(
+            int(
+                map_value_to_range(
+                    self.shield_visible, 0, 255, 0, self.shield_visibility_duration
+                )
+            )
+        )
         shield_rect: pygame.Rect = self.shield_image.get_rect(center=self.position)
         screen.blit(self.shield_image, shield_rect)
         self.shield_visible -= 1

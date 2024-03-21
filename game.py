@@ -9,6 +9,7 @@ from debris import Debris
 from laser import Laser
 from meteorite import Meteorite
 from player import Player
+from sound import Sound
 from uielemnts import Button, Counter, UpgradeCard
 from upgrade import UpgradeManager
 
@@ -72,7 +73,8 @@ class Game:
         self.warning_timer: int = pygame.event.custom_type()
         self.laser_back: int = pygame.event.custom_type()
         self.can_count_laser: bool = True
-        # ----------------------------------------------------
+        # Hang----------------------------------------------
+        self.sound = Sound()
         self.current_points: int = 0
         self.points: int = 0
         self.point_multiplier: int = 10
@@ -153,12 +155,15 @@ class Game:
         pygame.time.set_timer(
             self.debris_spawn_event, int(1000 / self.debris_spawn_rate)
         )
-        pygame.time.set_timer(self.warning_spawn, int(9000))  # első lézer 9sec
 
         text_surf: pygame.Surface = self.game_font.render(
             "Meghaltál!", True, self.font_color
         )
         text_rect: pygame.Rect = text_surf.get_rect(center=(1600 / 2, 900 / 2))
+
+        pygame.mixer.music.load(self.sound.all_music[self.sound.music_index])
+        pygame.mixer.music.set_volume(0.3)
+        pygame.mixer.music.play(-1)
 
         running: bool = True
         while running:
@@ -167,6 +172,8 @@ class Game:
                     running = False
                 if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                     self.player.grabber.extend()
+                    if self.game_state == GameState["IN_GAME"]:
+                        self.sound.extend_arm.play()
                     Button.handle_clicks()
 
                 if self.game_state == GameState["IN_GAME"]:
@@ -181,10 +188,14 @@ class Game:
                     if event.type == self.warning_spawn:
                         self.laser.get_pos()
                         self.laser.show_warning = True
+                        if self.game_state == GameState["IN_GAME"]:
+                            self.sound.warning.play()
                         pygame.time.set_timer(self.warning_timer, int(2000), 1)
                     if event.type == self.warning_timer:
                         self.laser.show_warning = False
                         self.laser.laser_go = True
+                        if self.game_state == GameState["IN_GAME"]:
+                            self.sound.laser.play()
                         pygame.time.set_timer(self.laser_timer, int(700), 1)
                     if event.type == self.laser_timer:
                         self.laser.laser_go = False
@@ -192,12 +203,31 @@ class Game:
                 # ------------------------------------------------
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_SPACE:
+                        pygame.time.set_timer(
+                            self.warning_spawn, int(9000)
+                        )  # első lézer 9sec
                         if self.game_state == GameState["MAIN_MENU"]:
                             self.set_game_state(GameState["IN_GAME"])
+                            pygame.mixer.music.stop()
+                            self.sound.music_index += 1
+                            self.sound.music_index_controll()
+                            pygame.mixer.music.load(
+                                self.sound.all_music[self.sound.music_index]
+                            )
+                            pygame.mixer.music.play(-1)
+                            pygame.mixer.music.set_volume(0.6)
                         elif (
-                                self.game_state == GameState["IN_GAME"] and self.player.dead
+                            self.game_state == GameState["IN_GAME"] and self.player.dead
                         ):
                             self.reset()
+                            pygame.mixer.music.stop()
+                            self.sound.music_index += 1
+                            self.sound.music_index_controll()
+                            pygame.mixer.music.load(
+                                self.sound.all_music[self.sound.music_index]
+                            )
+                            pygame.mixer.music.play(-1)
+                            pygame.mixer.music.set_volume(0.3)
 
             keys: pygame.key.ScancodeWrapper = pygame.key.get_pressed()
             if self.game_state == GameState["IN_GAME"]:
@@ -222,6 +252,11 @@ class Game:
                 if self.player.dead:
                     self.screen.blit(text_surf, text_rect)
 
+                if self.laser.enabled:
+                    self.point_multiplier = 15
+                else:
+                    self.point_multiplier = 10
+
                 self.current_points += self.player.update() * self.point_multiplier
                 self.player.grabber.check_collect(Debris.debris_group.sprites())  # type: ignore
                 collision: bool = self.player.check_collision(Meteorite.meteorites.sprites())  # type: ignore
@@ -231,12 +266,12 @@ class Game:
                 self.player.draw(self.screen)
 
                 if (
-                        self.player.check_kill_collision(
-                            self.laser.kill_rect,
-                            self.laser.kill_rect_ver,
-                            self.laser.direction,
-                        )
-                        and self.laser.laser_go
+                    self.player.check_kill_collision(
+                        self.laser.kill_rect,
+                        self.laser.kill_rect_ver,
+                        self.laser.direction,
+                    )
+                    and self.laser.laser_go
                 ):
                     self.player.die()
 
@@ -282,7 +317,6 @@ class Game:
 
         self.laser.all_laser = 0
         pygame.time.set_timer(self.warning_spawn, 0)
-        pygame.time.set_timer(self.warning_spawn, int(9000))
 
         self.save()
 
@@ -326,7 +360,7 @@ class Game:
 
     # don't know why this is needed, but doesn't work without it
     def create_callables(
-            self, upgrade_name: str
+        self, upgrade_name: str
     ) -> tuple[Callable[[], typing.Any], Callable[[], bool]]:
         return (
             lambda: self.try_buy(upgrade_name),
@@ -354,7 +388,7 @@ class Game:
     def save(self) -> None:
         save_dict: dict[str, int | dict[str, int]] = {
             "points": self.points,
-            "upgrades": self.upgrade_manager.upgrades
+            "upgrades": self.upgrade_manager.upgrades,
         }
         with open("saves.json", "w", encoding="utf-8") as file:
             json.dump(save_dict, file)
