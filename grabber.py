@@ -62,6 +62,7 @@ class Grabber:
 
         for debris in self.caught_debris:
             debris.kill()
+            self.sound.collect.play()
         self.caught_debris = []
 
         return points
@@ -93,7 +94,6 @@ class Grabber:
                 hitbox_position, 20, debris.position, 10
             ):
                 if debris.caught:
-                    self.sound.collect.play()
                     continue
                 self.caught_debris.append(debris)
                 debris.caught = True
