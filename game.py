@@ -212,12 +212,14 @@ class Game:
                     if event.type == self.warning_spawn:
                         self.laser.get_pos()
                         self.laser.show_warning = True
-                        self.sound.warning.play()
+                        if self.game_state == GameState["IN_GAME"]:
+                            self.sound.warning.play()
                         pygame.time.set_timer(self.warning_timer, int(2000), 1)
                     if event.type == self.warning_timer:
                         self.laser.show_warning = False
                         self.laser.laser_go = True
-                        self.sound.laser.play()
+                        if self.game_state == GameState["IN_GAME"]:
+                            self.sound.laser.play()
                         pygame.time.set_timer(self.laser_timer, int(700), 1)
                     if event.type == self.laser_timer:
                         self.laser.laser_go = False
@@ -278,6 +280,11 @@ class Game:
 
                 if self.player.dead:
                     self.screen.blit(text_surf, text_rect)
+
+                if self.laser.enabled:
+                    self.point_multiplier = 15
+                else:
+                    self.point_multiplier = 10
 
                 self.current_points += self.player.update() * self.point_multiplier
                 self.player.grabber.check_collect(Debris.debris_group.sprites())  # type: ignore
@@ -340,7 +347,6 @@ class Game:
 
         self.laser.all_laser = 0
         pygame.time.set_timer(self.warning_spawn, 0)
-        pygame.time.set_timer(self.warning_spawn, int(9000))
 
         self.save()
 
