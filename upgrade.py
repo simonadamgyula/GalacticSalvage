@@ -51,12 +51,12 @@ class UpgradeManager:
             "shield": [0, 1, 2]
         }
         self.upgrade_display: dict[str, tuple[str, str]] = {
-            "max_velocity": ("Sebesség", "Megnöveli az űrhajó \rmaximális sebességét"),
-            "rotation_speed": ("Forgási sebesség", "Megnöveli az űrhajó \rforgásának sebességét"),
-            "can_slow_down": ("Lassítás", "Az űrhajó le tud lassítana \r(S vagy Lefele Nyíl)"),
-            "grabber_speed": ("Kar sebessége", "Megnöveli az űrhajó karjának \rkinyúlási és visszahúzódási sebességét"),
-            "grabber_length": ("Kar hossza", "Megnöveli az űrhajó \rkarjának hosszát"),
-            "shield": ("Pajzs", "Megvédi az űrhajót a \rmeteoroktól egy alkalommal")
+            "max_velocity": ("Sebesség", "Megnöveli az űrhajó \nmaximális sebességét"),
+            "rotation_speed": ("Forgási sebesség", "Megnöveli az űrhajó \nforgásának sebességét"),
+            "can_slow_down": ("Lassítás", "Az űrhajó le tud lassítana \n(S vagy Lefele Nyíl)"),
+            "grabber_speed": ("Kar sebessége", "Megnöveli az űrhajó \nkarjának kinyúlási és \nvisszahúzódási sebességét"),
+            "grabber_length": ("Kar hossza", "Megnöveli az űrhajó \nkarjának hosszát"),
+            "shield": ("Pajzs", "Megvédi az űrhajót a \nmeteoroktól egy alkalommal")
         }
 
         self.upgrades.update(upgrades)

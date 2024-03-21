@@ -46,7 +46,7 @@ class Game:
             "font/Beyonders-6YoJM.ttf", 20
         )
         self.font_10: pygame.font.Font = pygame.font.Font(
-            "font/ninifont-caps.otf", 25
+            "font/Anta-Regular.ttf", 25
         )
         self.other_font = pygame.font.Font("font/ninifont-caps.otf", 50)
         self.font_color = pygame.Color(255, 87, 51)
@@ -74,7 +74,7 @@ class Game:
         self.can_count_laser: bool = True
         # ----------------------------------------------------
         self.current_points: int = 0
-        self.points: int = 145
+        self.points: int = 0
         self.point_multiplier: int = 10
 
         self.upgrade_manager: UpgradeManager = UpgradeManager({})
@@ -353,7 +353,7 @@ class Game:
                     callables[1],
                     upgrade_display[1],
                     self.font_10,
-                    center=(400 * (index + 1), 400),
+                    center=(400 * (index + 1), 300),
                 )
             )
 
