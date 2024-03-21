@@ -20,7 +20,6 @@ class UpgradeManager:
     def __init__(self, upgrades: dict[str, int]) -> None:
         self.upgrades: dict[str, int] = {
             "max velocity": 0,
-            "acceleration": 0,
             "rotation speed": 0,
             "can slow down": 0,
             "grabber speed": 0,
@@ -29,7 +28,6 @@ class UpgradeManager:
         }
         self.max_upgrades: dict[str, int] = {
             "max velocity": 4,
-            "acceleration": 2,
             "rotation speed": 2,
             "can slow down": 1,
             "grabber speed": 2,
@@ -37,17 +35,15 @@ class UpgradeManager:
             "shield": 2
         }
         self.upgrade_cost: dict[str, list[int]] = {
-            "max velocity": [100, 130, 185, 234],
-            "acceleration": [240, 315],
-            "rotation speed": [310, 420],
-            "can slow down": [240],
-            "grabber speed": [100, 150],
-            "grabber length": [145, 187, 252, 301],
-            "shield": [160, 330]
+            "max velocity": [50, 65, 120, 115],
+            "rotation speed": [160, 210],
+            "can slow down": [120],
+            "grabber speed": [50, 75],
+            "grabber length": [72, 93, 126, 151],
+            "shield": [80, 165]
         }
         self.upgrade_values: dict[str, list[float | bool]] = {
             "max velocity": [3, 3.3, 3.5, 3.8, 4.2],
-            "acceleration": [0.5, 0.8, 1],
             "rotation speed": [2, 2.7, 3.5],
             "can slow down": [False, True],
             "grabber speed": [5, 9, 13],

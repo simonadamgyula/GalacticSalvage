@@ -215,7 +215,6 @@ class Player:
 
     def load_upgrades(self, upgrades: dict[str, float | bool]) -> None:
         self.max_velocity = upgrades["max velocity"]
-        self.acceleration = upgrades["acceleration"]
         self.rotation_speed = upgrades["rotation speed"]
         self.grabber.extension_speed = upgrades["grabber speed"]
         self.can_slow_down = bool(upgrades["can slow down"])
