@@ -88,18 +88,24 @@ class Image:
 
 
 class Text:
-    def __init__(
-        self,
-        text: str,
-        font: pygame.font.Font,
-        color: tuple[int, int, int] | str,
-        **position: tuple[int, int],
-    ) -> None:
-        self.surface: pygame.Surface = font.render(text, True, color)
-        self.rect: pygame.Rect = self.surface.get_rect(**position)
+    def __init__(self, text: str, font: pygame.font.Font, color: tuple[int, int, int] | str,
+                 line_height: int = 30, **position: tuple[int, int]) -> None:
+        lines: list[str] = text.split("\n")
+        self.surfaces: list[pygame.Surface] = []
+        self.line_height: int = line_height
+
+        self.position: dict[str, tuple[int, int]] = position
+        self.position_anchor: str = list(self.position.keys())[0]
+
+        for line in lines:
+            self.surfaces.append(font.render(line, True, color))
 
     def draw(self, screen: pygame.Surface) -> None:
-        screen.blit(self.surface, self.rect)
+        for index, surface in enumerate(self.surfaces):
+            position: tuple[int, int] = self.position[self.position_anchor]
+            position = (position[0], position[1] + (self.line_height * index))
+            rect = surface.get_rect(**{self.position_anchor: position})
+            screen.blit(surface, rect)
 
 
 class Counter:
@@ -130,48 +136,26 @@ class Counter:
 
 
 class UpgradeCard:
-    def __init__(
-        self,
-        size: tuple[int, int],
-        text: str,
-        price: int,
-        font: pygame.font.Font,
-        image: str,
-        color: tuple[int, int, int] | str,
-        font_color: tuple[int, int, int] | str,
-        function: Callable[[], typing.Any],
-        active: Callable[[], bool],
-        disabled_color: tuple[int, int, int] | str = "gray",
-        **position: tuple[int, int],
-    ) -> None:
-        self.surface: pygame.Surface = pygame.Surface(
-            size, pygame.SRCALPHA, 32
-        ).convert_alpha()
+    def __init__(self, size: tuple[int, int], text: str, price: int, font: pygame.font.Font,
+                 image: str, color: tuple[int, int, int] | str, font_color: tuple[int, int, int] | str,
+                 function: Callable[[], typing.Any], active: Callable[[], bool], description: str,
+                 description_font: pygame.font.Font, disabled_color: tuple[int, int, int] | str = "gray",
+                 **position: tuple[int, int]) -> None:
+        self.surface: pygame.Surface = pygame.Surface(size, pygame.SRCALPHA, 32).convert_alpha()
 
         position: tuple[int, int] = position.get("center", (0, 0))
 
         self.image: Image = Image(image, center=position)
-        self.name: Text = Text(
-            text, font, font_color, center=(position[0], position[1] + 100)
-        )
-        self.price_text: Text = Text(
-            f"Price: {price}", font, font_color, center=(position[0], position[1] + 200)
-        )
-        self.button: Button = Button(
-            (100, 50),
-            "Buy",
-            font,
-            color,
-            font_color,
-            function,
-            active=active,
-            usage=1,
-            disabled_color=disabled_color,
-            center=(position[0], position[1] + 300),
-        )
+        self.name: Text = Text(text, font, font_color, center=(position[0], position[1] + 100))
+        self.price_text: Text = Text(f"Price: {price}", font, font_color, center=(position[0], position[1] + 200))
+        self.description: Text = Text(description, description_font, "white", center=(position[0], position[1] + 270))
+        self.button: Button = Button((100, 50),
+                                     "Buy", font, color, font_color, function, active=active,
+                                     usage=1, disabled_color=disabled_color, center=(position[0], position[1] + 400))
 
     def draw(self, screen: pygame.Surface) -> None:
         self.image.draw(screen)
         self.name.draw(screen)
         self.price_text.draw(screen)
+        self.description.draw(screen)
         self.button.draw(screen)

@@ -234,12 +234,11 @@ class Player:
         return False
 
     def load_upgrades(self, upgrades: dict[str, float | bool]) -> None:
-        self.max_velocity = upgrades["max velocity"]
-        self.acceleration = upgrades["acceleration"]
-        self.rotation_speed = upgrades["rotation speed"]
-        self.grabber.extension_speed = upgrades["grabber speed"]
-        self.can_slow_down = bool(upgrades["can slow down"])
-        self.grabber.update_length(upgrades["grabber length"])
+        self.max_velocity = upgrades["max_velocity"]
+        self.rotation_speed = upgrades["rotation_speed"]
+        self.grabber.extension_speed = upgrades["grabber_speed"]
+        self.can_slow_down = bool(upgrades["can_slow_down"])
+        self.grabber.update_length(upgrades["grabber_length"])
 
         self.max_shield = int(upgrades["shield"])
         self.shield = copy(self.max_shield)
