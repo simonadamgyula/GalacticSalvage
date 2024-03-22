@@ -135,6 +135,9 @@ class Game:
         self.upgrade_cards: list[UpgradeCard] = []
         self.new_upgrades()
 
+        self.bg: pygame.Surface = pygame.image.load("img/background/main_menu.png").convert()
+        self.bg_laser: pygame.Surface = pygame.image.load("img/background/main_menu_laser.png").convert()
+
         self.load()
 
     def run(self) -> None:
@@ -277,7 +280,10 @@ class Game:
 
                 self.laser.update(self.screen)
             elif self.game_state == GameState["MAIN_MENU"]:
-                self.screen.fill("black")
+                if self.laser.enabled:
+                    self.screen.blit(self.bg_laser, (0, 0))
+                else:
+                    self.screen.blit(self.bg, (0, 0))
                 self.help_button.draw(self.screen)
 
                 if self.screen_note:
