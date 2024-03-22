@@ -46,9 +46,7 @@ class Game:
         self.upgrade_button_font: pygame.font.Font = pygame.font.Font(
             "font/Beyonders-6YoJM.ttf", 20
         )
-        self.font_10: pygame.font.Font = pygame.font.Font(
-            "font/Anta-Regular.ttf", 25
-        )
+        self.font_10: pygame.font.Font = pygame.font.Font("font/Anta-Regular.ttf", 25)
         self.other_font = pygame.font.Font("font/ninifont-caps.otf", 50)
         self.font_color = pygame.Color(255, 87, 51)
 
@@ -171,9 +169,8 @@ class Game:
                 if event.type == pygame.QUIT:
                     running = False
                 if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                    self.player.grabber.extend()
                     if self.game_state == GameState["IN_GAME"]:
-                        self.sound.extend_arm.play()
+                        self.player.grabber.extend()
                     Button.handle_clicks()
 
                 if self.game_state == GameState["IN_GAME"]:
@@ -340,7 +337,9 @@ class Game:
             callables: tuple[Callable[[], typing.Any], Callable[[], bool]] = (
                 self.create_callables(upgrade[0])
             )
-            upgrade_display: tuple[str, str] = self.upgrade_manager.upgrade_display[upgrade[0]]
+            upgrade_display: tuple[str, str] = self.upgrade_manager.upgrade_display[
+                upgrade[0]
+            ]
             self.upgrade_cards.append(
                 UpgradeCard(
                     (200, 300),

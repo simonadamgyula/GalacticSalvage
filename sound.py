@@ -1,5 +1,6 @@
 import pygame
 
+
 class Sound:
     def __init__(self):
         pygame.mixer.init()
@@ -16,6 +17,7 @@ class Sound:
         self.wrong_button = pygame.mixer.Sound("sound/wrong_button.mp3")
         self.extend_arm = pygame.mixer.Sound("sound/extend_arm.mp3")
         self.collect = pygame.mixer.Sound("sound/collect.mp3")
+        self.catch = pygame.mixer.Sound("sound/catch.mp3")
 
     def music_index_controll(self) -> None:
         if self.music_index > 1:

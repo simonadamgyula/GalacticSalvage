@@ -35,6 +35,7 @@ class Grabber:
 
         self.rotate()
         self.extension_stage = ExtensionStage["EXTENDING"]
+        self.sound.extend_arm.play()
 
     def update(self, position: pygame.Vector2) -> int:
         self.move(position)
