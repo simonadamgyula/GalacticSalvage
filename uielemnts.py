@@ -75,12 +75,15 @@ class Image:
     def __init__(
         self,
         path: str,
-        size: tuple[int, int] | None = None,
+        size: tuple[int, int] | float | None = None,
         **position: tuple[int, int],
     ) -> None:
         self.surface: pygame.Surface = pygame.image.load(path).convert_alpha()
         if size:
-            self.surface = pygame.transform.scale(self.surface, size)
+            if isinstance(size, tuple):
+                self.surface = pygame.transform.scale(self.surface, size)
+            elif isinstance(size, float):
+                self.surface = pygame.transform.scale_by(self.surface, (size, size))
         self.rect: pygame.Rect = self.surface.get_rect(**position)
 
     def draw(self, screen: pygame.Surface) -> None:
@@ -145,7 +148,7 @@ class UpgradeCard:
 
         position: tuple[int, int] = position.get("center", (0, 0))
 
-        self.image: Image = Image(image, center=position)
+        self.image: Image = Image(image, float(2), center=position)
         self.name: Text = Text(text, font, font_color, center=(position[0], position[1] + 100))
         self.price_text: Text = Text(f"Price: {price}", font, font_color, center=(position[0], position[1] + 200))
         self.description: Text = Text(description, description_font, "white", center=(position[0], position[1] + 270))
