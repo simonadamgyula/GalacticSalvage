@@ -43,7 +43,7 @@ class UpgradeManager:
             "shield": [160, 330]
         }
         self.upgrade_values: dict[str, list[float | bool]] = {
-            "max_velocity": [3, 3.3, 3.5, 3.8, 4.2],
+            "max_velocity": [3.3, 3.8, 4.3, 4.9, 5.4],
             "rotation_speed": [2, 2.7, 3.5],
             "can_slow_down": [False, True],
             "grabber_speed": [5, 9, 13],

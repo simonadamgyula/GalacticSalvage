@@ -347,7 +347,7 @@ class Game:
                     upgrade_display[0],
                     upgrade[2],
                     self.upgrade_button_font,
-                    "img/debris/satellite.png",
+                    f"img/upgrades/{upgrade[0]}.png",
                     "black",
                     "white",
                     callables[0],
