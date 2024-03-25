@@ -135,8 +135,11 @@ class Game:
         self.upgrade_cards: list[UpgradeCard] = []
         self.new_upgrades()
 
-        self.bg: pygame.Surface = pygame.image.load("img/background/main_menu.png").convert()
-        self.bg_laser: pygame.Surface = pygame.image.load("img/background/main_menu_laser.png").convert()
+        self.default_background: pygame.Surface = pygame.image.load("img/background/main_menu.png").convert()
+        self.laser_background: pygame.Surface = pygame.image.load("img/background/main_menu_laser.png").convert()
+        self.current_background: pygame.Surface = self.default_background
+        self.next_background: pygame.Surface = self.default_background
+        self.background_opacity: float = 1
 
         self.load()
 
@@ -280,10 +283,8 @@ class Game:
 
                 self.laser.update(self.screen)
             elif self.game_state == GameState["MAIN_MENU"]:
-                if self.laser.enabled:
-                    self.screen.blit(self.bg_laser, (0, 0))
-                else:
-                    self.screen.blit(self.bg, (0, 0))
+                self.change_background()
+                self.screen.blit(self.current_background, (0, 0))
                 self.help_button.draw(self.screen)
 
                 if self.screen_note:
@@ -388,8 +389,22 @@ class Game:
         self.laser.enabled = not self.laser.enabled
         if self.laser.enabled:
             self.laser_button.bg_color = (70, 150, 110)
+            self.next_background = self.laser_background
         else:
             self.laser_button.bg_color = (0, 0, 0)
+            self.next_background = self.default_background
+
+    def change_background(self) -> None:
+        self.screen.fill("black")
+        self.current_background.set_alpha(int(255 * self.background_opacity))
+        if self.current_background == self.next_background:
+            self.background_opacity += 0.3
+            self.background_opacity = min(self.background_opacity, 1)
+            return
+        if self.background_opacity <= 0:
+            self.current_background = self.next_background
+            self.background_opacity = 0
+        self.background_opacity -= 0.3
 
     def save(self) -> None:
         save_dict: dict[str, int | dict[str, int]] = {
