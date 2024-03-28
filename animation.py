@@ -3,10 +3,10 @@ import pygame
 
 class Animation:
     def __init__(self, images: list[pygame.Surface], animation_speed: float, repeating: bool = True) -> None:
-        self.images = images
-        self.animation_speed = animation_speed
+        self.images: list[pygame.Surface] = images
+        self.animation_speed: float = animation_speed
         self.length = len(images)
-        self.index = 0
+        self.index: float = 0
         self.repeating: bool = repeating
 
     def next(self) -> pygame.Surface | None:

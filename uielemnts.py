@@ -148,8 +148,8 @@ class UpgradeCard:
 
         position: tuple[int, int] = position.get("center", (0, 0))
 
-        self.image: Image = Image(image, float(2), center=position)
-        self.name: Text = Text(text, font, font_color, center=(position[0], position[1] + 100))
+        self.image: Image = Image(image, float(2), center=position)  # type: ignore
+        self.name: Text = Text(text, font, font_color, center=(position[0], position[1] + 100))  # type: ignore
         self.price_text: Text = Text(f"Price: {price}", font, font_color, center=(position[0], position[1] + 200))
         self.description: Text = Text(description, description_font, "white", center=(position[0], position[1] + 270))
         self.button: Button = Button((100, 50),
