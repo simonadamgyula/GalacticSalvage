@@ -25,6 +25,7 @@ class Collision:
                 Collision.intersection_of_linesegments(segment, (verticies[i], verticies[i - 1]))
             if intersection:
                 return intersection
+        return None
 
     @staticmethod
     def intersection_of_linesegments(segment1: tuple[pygame.Vector2, pygame.Vector2],
@@ -39,12 +40,12 @@ class Collision:
         c: float = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4)
 
         if c == 0:
-            return
+            return None
 
         t: float = a / c
         u: float = -b / c
 
         if t < 0 or t > 1 or u < 0 or u > 1:
-            return
+            return None
 
         return pygame.Vector2(x1 + t * (x2 - x1), y1 + t * (y2 - y1))
