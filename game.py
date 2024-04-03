@@ -88,10 +88,10 @@ class Game:
         self.settings_screen: bool = False
 
         self.help_text: Text = Text(
-            "Galactic Salvage",
-            self.setting_font,
+            "A ürhajó mozgását  a WASD billentyükkel vagy a nyilakkal irányítod,\n\na karját pedig abal egérkattintással. A célod minél több ürszemetet\n\nösszeszedni, miközben kerülgeted a meteorokat és póbálsz a pályán\n\nbelül maradni. Minden eggyes darab ürroncs után pontokat\n\nfogsz kapni amit fejlesztésekre tudsz elkölteni a menüben.\n\n\n\nHa túl könnyü a játék a beállítások között lézereket is tudsz\n\nbekapcsolni",
+            self.upgrade_button_font,
             (255, 255, 255),
-            topleft=(800, 330),
+            topleft=(175, 250),
         )
         self.title_text: Text = Text(
             "Galactic Salvage",
