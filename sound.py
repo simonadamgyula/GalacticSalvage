@@ -1,9 +1,17 @@
-from typing import List
+from typing import List, Any
 
 import pygame
 
 
 class Sound:
+    __instance: Any = None
+
+    def __new__(cls) -> "Sound":
+        if cls.__instance is None:
+            cls.__instance = super(Sound, cls).__new__(cls)
+            return cls.__instance
+        return cls.__instance
+
     def __init__(self) -> None:
         pygame.mixer.init()
         self.music_index: int = 0

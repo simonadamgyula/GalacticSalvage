@@ -127,7 +127,7 @@ class Game:
             (500, 100),
             "hang",
             self.score_font,
-            (0, 0, 0),
+            (70, 150, 110),
             "white",
             lambda: self.toggle_sound(),
             lambda: self.game_state == GameState["MAIN_MENU"],
@@ -178,7 +178,7 @@ class Game:
             "Meghaltál!", True, self.font_color
         )
         text_rect: pygame.Rect = text_surf.get_rect(center=(1600 / 2, 900 / 2))
-
+        
         pygame.mixer.music.load(self.sound.all_music[self.sound.music_index])
         pygame.mixer.music.set_volume(0.3)
         pygame.mixer.music.play(-1)
@@ -410,9 +410,9 @@ class Game:
         self.sound.enabled = not self.sound.enabled
         self.sound.controll_volume()
         if self.sound.enabled:
-            self.sound_button.bg_color = (0, 0, 0)
-        else:
             self.sound_button.bg_color = (70, 150, 110)
+        else:
+            self.sound_button.bg_color = (0,0,0)
 
     def change_background(self) -> None:
         self.screen.fill("black")
