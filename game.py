@@ -1,16 +1,17 @@
+import json
 import typing
-from enum import Enum
 from collections.abc import Callable
+from enum import Enum
 
 import pygame
 
+from debris import Debris
 from laser import Laser
 from meteorite import Meteorite
 from player import Player
-from debris import Debris
+from sound import Sound
+from uielemnts import Button, Counter, UpgradeCard
 from upgrade import UpgradeManager
-
-from uielemnts import Button, UpgradeCard, Counter
 
 GameState = Enum("GameState", ["MAIN_MENU", "IN_GAME", "UPGRADE_MENU"])
 
@@ -33,10 +34,13 @@ class Game:
         self.game_state: GameState = GameState["MAIN_MENU"]
 
         self.counter_font: pygame.font.Font = pygame.font.Font(None, 200)
+
         self.font80: pygame.font.Font = pygame.font.Font("font/Beyonders-6YoJM.ttf", 80)
         self.font40: pygame.font.Font = pygame.font.Font("font/Beyonders-6YoJM.ttf", 40)
         self.font30: pygame.font.Font = pygame.font.Font("font/Beyonders-6YoJM.ttf", 30)
         self.font20: pygame.font.Font = pygame.font.Font("font/Beyonders-6YoJM.ttf", 20)
+        self.font_10: pygame.font.Font = pygame.font.Font("font/Anta-Regular.ttf", 25)
+
         self.other_font = pygame.font.Font("font/ninifont-caps.otf", 50)
         self.font_color = pygame.Color(255, 87, 51)
 
@@ -47,7 +51,8 @@ class Game:
         self.debris_spawn_rate: float = 0.2
         self.debris_spawn_event: int = pygame.event.custom_type()
         Debris.create_random(self.screen_resolution)
-        self.laser = Laser(
+        # Lézerrel kapcsolatos dolgok
+        self.laser: Laser = Laser(
             (
                 self.screen_resolution[0] - 50,
                 self.screen_resolution[1] + self.screen_resolution[1],
@@ -58,27 +63,36 @@ class Game:
         self.laser_timer: int = pygame.event.custom_type()
         self.warning_spawn: int = pygame.event.custom_type()
         self.warning_timer: int = pygame.event.custom_type()
-
+        self.laser_back: int = pygame.event.custom_type()
+        self.can_count_laser: bool = True
+        # Hang----------------------------------------------
+        self.sound = Sound()
         self.current_points: int = 0
-        self.points: int = 145
+        self.points: int = 0
         self.point_multiplier: int = 10
 
-        self.upgrade_manager: UpgradeManager = UpgradeManager(
-            {
-                # "max_velocity": 4,
-                # "acceleration": 2,
-                # "grabber_speed": 2,w
-                # "rotation_speed": 2,aa
-                # "can_slow_down": 1,
-                # "grabber length": 4
-            }
-        )
+
+        self.upgrade_manager: UpgradeManager = UpgradeManager({})
+
         self.player.load_upgrades(self.upgrade_manager.get_upgrade_values)
+
+        self.screen_note: bool = False
+        self.help_button: Button = Button(
+            (100, 100),
+            "?",
+            self.game_font_smaller,
+            None,
+            "white",
+            lambda: self.toggle_screen_note(),
+            lambda: self.game_state == GameState["MAIN_MENU"],
+            center=(100, 100),
+        )
 
         self.upgrade_button: Button = Button(
             (200, 100),
-            "Upgrade",
+            "upgrade",
             self.font20,
+
             (63, 63, 63),
             "white",
             lambda: self.set_game_state(GameState["UPGRADE_MENU"]),
@@ -95,6 +109,27 @@ class Game:
             lambda: self.game_state == GameState["UPGRADE_MENU"],
             center=(100, 100),
         )
+
+        self.laser_button: Button = Button(
+            (500, 100),
+            "lézer",
+            self.font40,
+            (0, 0, 0),
+            "white",
+            lambda: self.toggle_laser(),
+            lambda: self.game_state == GameState["MAIN_MENU"],
+            center=(1400, 50),
+        )
+        self.sound_button: Button = Button(
+            (500, 100),
+            "hang",
+            self.font30,
+            (0, 0, 0),
+            "white",
+            lambda: self.toggle_sound(),
+            lambda: self.game_state == GameState["MAIN_MENU"],
+            center=(900, 50),
+        )
         self.point_counter: Counter = Counter(
             self.font40, "", (255, 255, 255), center=(300, 100)
         )
@@ -104,6 +139,18 @@ class Game:
 
         self.upgrade_cards: list[UpgradeCard] = []
         self.new_upgrades()
+
+        self.default_background: pygame.Surface = pygame.image.load(
+            "img/background/main_menu.png"
+        ).convert()
+        self.laser_background: pygame.Surface = pygame.image.load(
+            "img/background/main_menu_laser.png"
+        ).convert()
+        self.current_background: pygame.Surface = self.default_background
+        self.next_background: pygame.Surface = self.default_background
+        self.background_opacity: float = 1
+
+        self.load()
 
     def run(self) -> None:
         # main menu
@@ -146,7 +193,9 @@ class Game:
             center=(1600 / 2, 900 / 2 + 100)
         )
 
-        button_surf.blit(button_text, button_text_rect)
+        pygame.mixer.music.load(self.sound.all_music[self.sound.music_index])
+        pygame.mixer.music.set_volume(0.3)
+        pygame.mixer.music.play(-1)
 
         running: bool = True
         while running:
@@ -154,52 +203,62 @@ class Game:
                 if event.type == pygame.QUIT:
                     running = False
                 if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                    self.player.grabber.extend()
-                    if (
-                        button_rect.collidepoint(pygame.mouse.get_pos())
-                        and self.game_state == GameState["MAIN_MENU"]
-                    ):
-                        screen_note = not screen_note
+                    if self.game_state == GameState["IN_GAME"]:
+                        self.player.grabber.extend()
+                    else:
+                        Button.handle_clicks()
 
-                    if self.upgrade_button.rect.collidepoint(pygame.mouse.get_pos()):
-                        self.upgrade_button.click()
-                    if self.back_button.rect.collidepoint(pygame.mouse.get_pos()):
-                        self.back_button.click()
-
-                    for card in self.upgrade_cards:
-                        if card.button.rect.collidepoint(pygame.mouse.get_pos()):
-                            success: bool = card.button.click()
-                            if success:
-                                self.player.load_upgrades(
-                                    self.upgrade_manager.get_upgrade_values
-                                )
                 if self.game_state == GameState["IN_GAME"]:
                     if event.type == self.meteor_spawn_event:
                         Meteorite.create_random(self.screen_resolution)
-                if event.type == self.debris_spawn_event:
-                    Debris.create_random(self.screen_resolution)
-                # if event.type == pygame.MOUSEBUTTONDOWN:
-                #     if pygame.mouse.get_pressed()[0]:
-                #         self.player.grabber.extend()
-                if event.type == self.warning_spawn:
-                    self.laser.get_pos()
-                    self.laser.show_warning = True
-                    pygame.time.set_timer(self.warning_timer, int(2000), 1)
-                if event.type == self.warning_timer:
-                    self.laser.show_warning = False
-                    self.laser.laser_go = True
-                    pygame.time.set_timer(self.laser_timer, int(2000), 1)
-                if event.type == self.laser_timer:
-                    self.laser.laser_go = False
+                    if event.type == self.debris_spawn_event:
+                        Debris.create_random(self.screen_resolution)
+
+                if self.laser.enabled:
+                    if self.laser.all_laser >= 10:
+                        self.laser.two_laser = True
+                    if event.type == self.warning_spawn:
+                        self.laser.get_pos()
+                        self.laser.show_warning = True
+                        if self.game_state == GameState["IN_GAME"]:
+                            self.sound.play_sound(self.sound.warning)
+                        pygame.time.set_timer(self.warning_timer, int(2000), 1)
+                    if event.type == self.warning_timer:
+                        self.laser.show_warning = False
+                        self.laser.laser_go = True
+                        if self.game_state == GameState["IN_GAME"]:
+                            self.sound.play_sound(self.sound.laser)
+                        pygame.time.set_timer(self.laser_timer, int(700), 1)
+                    if event.type == self.laser_timer:
+                        self.laser.laser_go = False
+                        self.laser.all_laser += 1
+                # ------------------------------------------------
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_SPACE:
+                        pygame.time.set_timer(
+                            self.warning_spawn, int(9000)
+                        )  # első lézer 9sec
                         if self.game_state == GameState["MAIN_MENU"]:
                             self.set_game_state(GameState["IN_GAME"])
+
+                            pygame.mixer.music.stop()
+                            self.sound.music_index += 1
+                            self.sound.music_index_controll()
+                            pygame.mixer.music.load(
+                                self.sound.all_music[self.sound.music_index]
+                            )
+                            pygame.mixer.music.play(-1)
                         elif (
                             self.game_state == GameState["IN_GAME"] and self.player.dead
                         ):
                             self.reset()
-
+                            pygame.mixer.music.stop()
+                            self.sound.music_index += 1
+                            self.sound.music_index_controll()
+                            pygame.mixer.music.load(
+                                self.sound.all_music[self.sound.music_index]
+                            )
+                            pygame.mixer.music.play(-1)
             keys: pygame.key.ScancodeWrapper = pygame.key.get_pressed()
             if self.game_state == GameState["IN_GAME"]:
                 self.player.rotate(
@@ -214,10 +273,8 @@ class Game:
 
                 self.screen.blit(bg_surf, (0, 0))
 
-                # text_points = self.game_font_smaller.render(
-                #     f"Pontszámod: {self.player.grabber.points}", 1, self.font_color
-                # )
-                # self.screen.blit(text_points, (20, 20))
+                self.in_game_counter.update(self.current_points)
+                self.in_game_counter.draw(self.screen)
 
                 Meteorite.meteorites.update(screen=self.screen)  # type: ignore
                 Debris.debris_group.update(screen=self.screen)  # type: ignore
@@ -226,16 +283,25 @@ class Game:
                     self.screen.blit(text_surf, text_rect)
                     self.screen.blit(play_again_surf, play_again_rect)
 
+                if self.laser.enabled:
+                    self.point_multiplier = 15
+                else:
+                    self.point_multiplier = 10
+
                 self.current_points += self.player.update() * self.point_multiplier
                 self.player.grabber.check_collect(Debris.debris_group.sprites())  # type: ignore
                 collision: bool = self.player.check_collision(Meteorite.meteorites.sprites())  # type: ignore
 
                 if collision:
-                    self.player.die()
+                    self.player.get_hit()
                 self.player.draw(self.screen)
 
                 if (
-                    self.player.check_kill_collision(self.laser.kill_rect)
+                    self.player.check_kill_collision(
+                        self.laser.kill_rect,
+                        self.laser.kill_rect_ver,
+                        self.laser.direction,
+                    )
                     and self.laser.laser_go
                 ):
                     self.player.die()
@@ -245,11 +311,11 @@ class Game:
 
                 self.laser.update(self.screen)
             elif self.game_state == GameState["MAIN_MENU"]:
-                self.screen.fill("black")
+                self.change_background()
+                self.screen.blit(self.current_background, (0, 0))
+                self.help_button.draw(self.screen)
 
-                self.screen.blit(button_surf, button_rect)
-
-                if screen_note:
+                if self.screen_note:
                     pygame.draw.rect(
                         self.screen, "white", (300, 200, 1000, 500), border_radius=50
                     )
@@ -258,6 +324,8 @@ class Game:
                     self.screen.blit(run_surf, run_rect)
 
                     self.upgrade_button.draw(self.screen)
+                    self.laser_button.draw(self.screen)
+                    self.sound_button.draw(self.screen)
             elif self.game_state == GameState["UPGRADE_MENU"]:
                 self.screen.fill("blue")
 
@@ -270,6 +338,7 @@ class Game:
             pygame.display.update()
             self.clock.tick(60)
 
+        self.save()
         pygame.quit()
 
     def reset(self) -> None:
@@ -282,8 +351,16 @@ class Game:
         self.points += self.current_points
         self.current_points = 0
 
+        self.laser.all_laser = 0
+        pygame.time.set_timer(self.warning_spawn, 0)
+
+        self.save()
+
     def set_game_state(self, state: GameState) -> None:
         self.game_state = state
+
+    def toggle_screen_note(self) -> None:
+        self.screen_note = not self.screen_note
 
     def draw_upgrade_cards(self) -> None:
         for card in self.upgrade_cards:
@@ -299,18 +376,23 @@ class Game:
             callables: tuple[Callable[[], typing.Any], Callable[[], bool]] = (
                 self.create_callables(upgrade[0])
             )
+            upgrade_display: tuple[str, str] = self.upgrade_manager.upgrade_display[
+                upgrade[0]
+            ]
             self.upgrade_cards.append(
                 UpgradeCard(
                     (200, 300),
-                    upgrade[0],
+                    upgrade_display[0],
                     upgrade[2],
-                    self.font20,
-                    "img/debris/satellite.png",
+                    self.upgrade_button_font,
+                    f"img/upgrades/{upgrade[0]}.png",
                     "black",
                     "white",
                     callables[0],
                     callables[1],
-                    center=(400 * (index + 1), 400),
+                    upgrade_display[1],
+                    self.font_10,
+                    center=(400 * (index + 1), 300),
                 )
             )
 
@@ -326,8 +408,58 @@ class Game:
     def try_buy(self, upgrade_name: str) -> None:
         cost: int = self.upgrade_manager.try_buy(upgrade_name, self.points)
         self.points -= cost
+        self.save()
+        self.player.load_upgrades(self.upgrade_manager.get_upgrade_values)
 
     @staticmethod
     def background_generate():
         bg_surf = pygame.image.load("img/background/space.png").convert_alpha()
         return bg_surf
+
+    def toggle_laser(self):
+        self.laser.enabled = not self.laser.enabled
+        if self.laser.enabled:
+            self.laser_button.bg_color = (70, 150, 110)
+            self.next_background = self.laser_background
+        else:
+            self.laser_button.bg_color = (0, 0, 0)
+            self.next_background = self.default_background
+
+    def toggle_sound(self):
+        self.sound.enabled = not self.sound.enabled
+        self.sound.controll_volume()
+        if self.sound.enabled:
+            self.sound_button.bg_color = (0, 0, 0)
+        else:
+            self.sound_button.bg_color = (70, 150, 110)
+
+    def change_background(self) -> None:
+        self.screen.fill("black")
+        self.current_background.set_alpha(int(255 * self.background_opacity))
+        if self.current_background == self.next_background:
+            self.background_opacity += 0.3
+            self.background_opacity = min(self.background_opacity, 1)
+            return
+        if self.background_opacity <= 0:
+            self.current_background = self.next_background
+            self.background_opacity = 0
+        self.background_opacity -= 0.3
+
+    def save(self) -> None:
+        save_dict: dict[str, int | dict[str, int]] = {
+            "points": self.points,
+            "upgrades": self.upgrade_manager.upgrades,
+        }
+        with open("saves.json", "w", encoding="utf-8") as file:
+            json.dump(save_dict, file)
+
+    def load(self) -> None:
+        try:
+            with open("saves.json", "r", encoding="utf-8") as file:
+                load_dict = json.load(file)
+        except FileNotFoundError:
+            return
+
+        self.points = load_dict.get("points", 0)
+        self.upgrade_manager = UpgradeManager(load_dict.get("upgrades", {}))
+        self.player.load_upgrades(self.upgrade_manager.get_upgrade_values)

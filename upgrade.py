@@ -19,41 +19,49 @@ class UpgradeManager:
 
     def __init__(self, upgrades: dict[str, int]) -> None:
         self.upgrades: dict[str, int] = {
-            "max velocity": 0,
-            "acceleration": 0,
-            "rotation speed": 0,
-            "can slow down": 0,
-            "grabber speed": 0,
-            "grabber length": 0
+            "max_velocity": 0,
+            "rotation_speed": 0,
+            "can_slow_down": 0,
+            "grabber_speed": 0,
+            "grabber_length": 0,
+            "shield": 0
         }
         self.max_upgrades: dict[str, int] = {
-            "max velocity": 4,
-            "acceleration": 2,
-            "rotation speed": 2,
-            "can slow down": 1,
-            "grabber speed": 2,
-            "grabber length": 4
+            "max_velocity": 4,
+            "rotation_speed": 2,
+            "can_slow_down": 1,
+            "grabber_speed": 2,
+            "grabber_length": 4,
+            "shield": 2
         }
         self.upgrade_cost: dict[str, list[int]] = {
-            "max velocity": [100, 130, 185, 234],
-            "acceleration": [240, 315],
-            "rotation speed": [310, 420],
-            "can slow down": [240],
-            "grabber speed": [100, 150],
-            "grabber length": [145, 187, 252, 301]
+            "max_velocity": [100, 130, 185, 234],
+            "rotation_speed": [310, 420],
+            "can_slow_down": [240],
+            "grabber_speed": [100, 150],
+            "grabber_length": [145, 187, 252, 301],
+            "shield": [160, 330]
         }
         self.upgrade_values: dict[str, list[float | bool]] = {
-            "max velocity": [3, 3.3, 3.5, 3.8, 4.2],
-            "acceleration": [0.5, 0.8, 1],
-            "rotation speed": [2, 2.7, 3.5],
-            "can slow down": [False, True],
-            "grabber speed": [5, 9, 13],
-            "grabber length": [0, 1, 2, 3, 4]
+            "max_velocity": [3.3, 3.8, 4.3, 4.9, 5.4],
+            "rotation_speed": [2, 2.7, 3.5],
+            "can_slow_down": [False, True],
+            "grabber_speed": [5, 9, 13],
+            "grabber_length": [0, 1, 2, 3, 4],
+            "shield": [0, 1, 2]
+        }
+        self.upgrade_display: dict[str, tuple[str, str]] = {
+            "max_velocity": ("Sebesség", "Megnöveli az űrhajó \nmaximális sebességét"),
+            "rotation_speed": ("Forgási sebesség", "Megnöveli az űrhajó \nforgásának sebességét"),
+            "can_slow_down": ("Lassítás", "Az űrhajó le tud lassítana \n(S vagy Lefele Nyíl)"),
+            "grabber_speed": ("Kar sebessége", "Megnöveli az űrhajó \nkarjának kinyúlási és \nvisszahúzódási sebességét"),
+            "grabber_length": ("Kar hossza", "Megnöveli az űrhajó \nkarjának hosszát"),
+            "shield": ("Pajzs", "Megvédi az űrhajót a \nmeteoroktól egy alkalommal")
         }
 
-        self.upgrades.update(upgrades)
-        for upgrade, value in self.upgrades.items():
-            self.upgrades[upgrade] = min(value, self.max_upgrades[upgrade])
+        # self.upgrades.update(upgrades)
+        # for upgrade, value in self.upgrades.items():
+        #     self.upgrades[upgrade] = min(value, self.max_upgrades[upgrade])
 
     def is_maxed(self, upgrade_name: str) -> bool:
         return self.upgrades[upgrade_name] == self.max_upgrades[upgrade_name]
