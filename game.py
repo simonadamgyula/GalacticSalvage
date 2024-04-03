@@ -80,7 +80,7 @@ class Game:
         self.help_button: Button = Button(
             (100, 100),
             "?",
-            self.game_font_smaller,
+            self.font40,
             None,
             "white",
             lambda: self.toggle_screen_note(),
@@ -123,7 +123,7 @@ class Game:
         self.sound_button: Button = Button(
             (500, 100),
             "hang",
-            self.font30,
+            self.font40,
             (0, 0, 0),
             "white",
             lambda: self.toggle_sound(),
@@ -384,7 +384,7 @@ class Game:
                     (200, 300),
                     upgrade_display[0],
                     upgrade[2],
-                    self.upgrade_button_font,
+                    self.font20,
                     f"img/upgrades/{upgrade[0]}.png",
                     "black",
                     "white",
