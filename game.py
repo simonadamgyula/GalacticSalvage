@@ -10,7 +10,7 @@ from laser import Laser
 from meteorite import Meteorite
 from player import Player
 from sound import Sound
-from uielemnts import Button, Counter, UpgradeCard
+from uielemnts import Button, Counter, Text, UpgradeCard
 from upgrade import UpgradeManager
 
 GameState = Enum("GameState", ["MAIN_MENU", "IN_GAME", "UPGRADE_MENU"])
@@ -45,6 +45,9 @@ class Game:
         )
         self.upgrade_button_font: pygame.font.Font = pygame.font.Font(
             "font/Beyonders-6YoJM.ttf", 20
+        )
+        self.setting_font: pygame.font.Font = pygame.font.Font(
+            "font/Beyonders-6YoJM.ttf", 15
         )
         self.font_10: pygame.font.Font = pygame.font.Font("font/Anta-Regular.ttf", 25)
         self.other_font = pygame.font.Font("font/ninifont-caps.otf", 50)
@@ -82,6 +85,26 @@ class Game:
         self.player.load_upgrades(self.upgrade_manager.get_upgrade_values)
 
         self.screen_note: bool = False
+        self.settings_screen: bool = False
+
+        self.laser_button_text: Text = Text(
+            "Ezzel a beállítással lézereket kapcsolsz be ,amelyek folyamtosan\nnehezíteni fogják a játékot, cserébe 10 pont helyett 15 pontot fogsz\nmajd kapni. A lézerek véletlenszerü helyeken jönnek, és a 10. lézer\nután már kettö darabot kell kerülgetni egyszerre. ",
+            self.setting_font,
+            (255, 255, 255),
+            topleft=(575, 290),
+        )
+        self.sound_button_text: Text = Text(
+            "Minden háttérzenén kívüi hang ki -bekapcsolása.",
+            self.setting_font,
+            (255, 255, 255),
+            topleft=(575, 510),
+        )
+        self.music_button_text: Text = Text(
+            "Háttérzene ki -bekapcsolása.",
+            self.setting_font,
+            (255, 255, 255),
+            topleft=(575, 685),
+        )
         self.help_button: Button = Button(
             (100, 100),
             "?",
@@ -90,7 +113,17 @@ class Game:
             "white",
             lambda: self.toggle_screen_note(),
             lambda: self.game_state == GameState["MAIN_MENU"],
-            center=(100, 100),
+            center=(75, 75),
+        )
+        self.settings_button: Button = Button(
+            (400, 100),
+            "settings",
+            self.score_font,
+            None,
+            "white",
+            lambda: self.toggle_settings_screen(),
+            lambda: self.game_state == GameState["MAIN_MENU"],
+            center=(1400, 75),
         )
 
         self.upgrade_button: Button = Button(
@@ -114,24 +147,34 @@ class Game:
             center=(100, 100),
         )
         self.laser_button: Button = Button(
-            (500, 100),
+            (500, 150),
             "lézer",
             self.score_font,
-            (0, 0, 0),
+            (255, 81, 81),
             "white",
             lambda: self.toggle_laser(),
             lambda: self.game_state == GameState["MAIN_MENU"],
-            center=(1400, 50),
+            center=(300, 350),
         )
         self.sound_button: Button = Button(
-            (500, 100),
+            (500, 150),
             "hang",
             self.score_font,
             (70, 150, 110),
             "white",
             lambda: self.toggle_sound(),
             lambda: self.game_state == GameState["MAIN_MENU"],
-            center=(900, 50),
+            center=(300, 525),
+        )
+        self.music_button: Button = Button(
+            (500, 150),
+            "zene",
+            self.score_font,
+            (70, 150, 110),
+            "white",
+            lambda: self.toggle_music(),
+            lambda: self.game_state == GameState["MAIN_MENU"],
+            center=(300, 700),
         )
         self.point_counter: Counter = Counter(
             self.game_font_smaller, "", (255, 255, 255), center=(300, 100)
@@ -178,7 +221,7 @@ class Game:
             "Meghaltál!", True, self.font_color
         )
         text_rect: pygame.Rect = text_surf.get_rect(center=(1600 / 2, 900 / 2))
-        
+
         pygame.mixer.music.load(self.sound.all_music[self.sound.music_index])
         pygame.mixer.music.set_volume(0.3)
         pygame.mixer.music.play(-1)
@@ -237,13 +280,6 @@ class Game:
                             self.game_state == GameState["IN_GAME"] and self.player.dead
                         ):
                             self.reset()
-                            pygame.mixer.music.stop()
-                            self.sound.music_index += 1
-                            self.sound.music_index_controll()
-                            pygame.mixer.music.load(
-                                self.sound.all_music[self.sound.music_index]
-                            )
-                            pygame.mixer.music.play(-1)
             keys: pygame.key.ScancodeWrapper = pygame.key.get_pressed()
             if self.game_state == GameState["IN_GAME"]:
                 self.player.rotate(
@@ -295,18 +331,25 @@ class Game:
                 self.change_background()
                 self.screen.blit(self.current_background, (0, 0))
                 self.help_button.draw(self.screen)
+                self.settings_button.draw(self.screen)
 
                 if self.screen_note:
                     pygame.draw.rect(
                         self.screen, "white", (300, 200, 1000, 500), border_radius=50
                     )
+                elif self.settings_screen:
+                    self.laser_button.draw(self.screen)
+                    self.sound_button.draw(self.screen)
+                    self.music_button.draw(self.screen)
+                    self.laser_button_text.draw(self.screen)
+                    self.sound_button_text.draw(self.screen)
+                    self.music_button_text.draw(self.screen)
+
                 else:
                     self.screen.blit(title_surf, title_rect)
                     self.screen.blit(run_surf, run_rect)
 
                     self.upgrade_button.draw(self.screen)
-                    self.laser_button.draw(self.screen)
-                    self.sound_button.draw(self.screen)
             elif self.game_state == GameState["UPGRADE_MENU"]:
                 self.screen.fill("blue")
 
@@ -336,9 +379,15 @@ class Game:
         pygame.time.set_timer(self.warning_spawn, 0)
 
         self.save()
+        pygame.mixer.music.stop()
+        pygame.mixer.music.load(self.sound.all_music[self.sound.music_index])
+        pygame.mixer.music.play(-1)
 
     def set_game_state(self, state: GameState) -> None:
         self.game_state = state
+
+    def toggle_settings_screen(self) -> None:
+        self.settings_screen = not self.settings_screen
 
     def toggle_screen_note(self) -> None:
         self.screen_note = not self.screen_note
@@ -403,16 +452,23 @@ class Game:
             self.laser_button.bg_color = (70, 150, 110)
             self.next_background = self.laser_background
         else:
-            self.laser_button.bg_color = (0, 0, 0)
+            self.laser_button.bg_color = (255, 81, 81)
             self.next_background = self.default_background
 
     def toggle_sound(self):
         self.sound.enabled = not self.sound.enabled
-        self.sound.controll_volume()
         if self.sound.enabled:
             self.sound_button.bg_color = (70, 150, 110)
         else:
-            self.sound_button.bg_color = (0,0,0)
+            self.sound_button.bg_color = (255, 81, 81)
+
+    def toggle_music(self):
+        self.sound.music_enabled = not self.sound.music_enabled
+        self.sound.controll_volume()
+        if self.sound.music_enabled:
+            self.music_button.bg_color = (70, 150, 110)
+        else:
+            self.music_button.bg_color = (255, 81, 81)
 
     def change_background(self) -> None:
         self.screen.fill("black")

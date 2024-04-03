@@ -32,6 +32,7 @@ class Sound:
         self.catch: pygame.mixer.Sound = pygame.mixer.Sound("sound/catch.mp3")
 
         self.enabled: bool = True
+        self.music_enabled: bool = True
 
         self.all_sound: List[pygame.mixer.Sound] = [
             self.laser,
@@ -49,7 +50,7 @@ class Sound:
             self.music_index = 0
 
     def controll_volume(self) -> None:
-        if self.enabled:
+        if self.music_enabled:
             pygame.mixer.music.set_volume(0.3)
         else:
             pygame.mixer.music.set_volume(0)

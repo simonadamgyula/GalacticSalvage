@@ -1,10 +1,8 @@
 import random
-
-import pygame
-
-
 from typing import List, Tuple
+
 import pygame
+
 
 class Laser(pygame.sprite.Sprite):
     def __init__(self, pos: Tuple[int, int], surface: pygame.Surface) -> None:
@@ -18,7 +16,7 @@ class Laser(pygame.sprite.Sprite):
         self.pos2_ver: Tuple[int, int] = (pos[0], 900 - self.pos_ver[1])
 
         self.direction: int = 1
-        
+
         self.random_color: int = 1
         self.colors: List[List[Tuple[int, int, int]]] = [
             # piros
@@ -59,24 +57,25 @@ class Laser(pygame.sprite.Sprite):
         self.laser_go: bool = False
 
         self.kill_rect: pygame.Rect = pygame.Rect((0, self.pos[1], 1600, 90))
-        self.kill_rect_ver: pygame.Rect = pygame.Rect((self.pos_ver[0] - 10, 0, 70, 900))
+        self.kill_rect_ver: pygame.Rect = pygame.Rect(
+            (self.pos_ver[0] - 10, 0, 70, 900)
+        )
 
         self.two_laser: bool = False
         self.all_laser: int = 0
 
         self.enabled: bool = False
 
-
     def update(self, screen: pygame.Surface) -> None:
         if self.two_laser:
             self.draw_laser(screen)
-            self.draw_warning(screen)  
+            self.draw_warning(screen)
             self.draw_laser_ver(screen)
             self.draw_warning_ver(screen)
         else:
             if self.direction == 1:
                 self.draw_laser(screen)
-                self.draw_warning(screen)            
+                self.draw_warning(screen)
             else:
                 self.draw_laser_ver(screen)
                 self.draw_warning_ver(screen)
@@ -96,7 +95,9 @@ class Laser(pygame.sprite.Sprite):
             height: int = 80
             pos: int = self.pos[1]
             for color in self.colors[self.random_color][::-1]:
-                surface: pygame.Surface = pygame.Surface((1600, height), pygame.SRCALPHA)
+                surface: pygame.Surface = pygame.Surface(
+                    (1600, height), pygame.SRCALPHA
+                )
                 pygame.draw.rect(
                     surface, (*color, 100), pygame.Rect(0, 0, 1600, height)
                 )
@@ -115,19 +116,18 @@ class Laser(pygame.sprite.Sprite):
                 screen.blit(surface, (pos, 0))
                 pos += 5
                 width -= 10
-        self.kill_rect_ver: pygame.Rect = pygame.Rect((self.pos_ver[0] - 10, 0, 70, 900))
+        self.kill_rect_ver: pygame.Rect = pygame.Rect(
+            (self.pos_ver[0] - 10, 0, 70, 900)
+        )
 
     def get_pos(self) -> None:
         self.direction: int = random.randint(1, 2)
         self.random_color: int = random.randint(0, 2)
         if self.direction == 1:
             random_num: int = random.randint(100, 800)
-            self.pos: Tuple[int,int] = (1475, random_num)
-            self.pos2: Tuple[int,int] = (25, self.pos[1])
+            self.pos: Tuple[int, int] = (1475, random_num)
+            self.pos2: Tuple[int, int] = (25, self.pos[1])
         else:
             random_num: int = random.randint(100, 1500)
-            self.pos_ver: Tuple[int,int] = (random_num, 25)
-            self.pos2_ver: Tuple[int,int] = (random_num, 775)
-
-    
-
+            self.pos_ver: Tuple[int, int] = (random_num, 25)
+            self.pos2_ver: Tuple[int, int] = (random_num, 775)
