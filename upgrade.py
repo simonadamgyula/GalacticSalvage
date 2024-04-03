@@ -59,9 +59,9 @@ class UpgradeManager:
             "shield": ("Pajzs", "Megvédi az űrhajót a \nmeteoroktól egy alkalommal")
         }
 
-        self.upgrades.update(upgrades)
-        for upgrade, value in self.upgrades.items():
-            self.upgrades[upgrade] = min(value, self.max_upgrades[upgrade])
+        # self.upgrades.update(upgrades)
+        # for upgrade, value in self.upgrades.items():
+        #     self.upgrades[upgrade] = min(value, self.max_upgrades[upgrade])
 
     def is_maxed(self, upgrade_name: str) -> bool:
         return self.upgrades[upgrade_name] == self.max_upgrades[upgrade_name]

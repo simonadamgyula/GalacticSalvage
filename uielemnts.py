@@ -55,12 +55,12 @@ class Button:
 
     def click(self) -> typing.Any:
         if self.usage == 0:
-            self.sound.wrong_button.play()
+            self.sound.play_sound(self.sound.wrong_button)
             return
         self.usage -= 1 if self.usage > 0 else 0
 
         if self.active():
-            self.sound.button.play()
+            self.sound.play_sound(self.sound.button)
             return self.function()
 
     @staticmethod

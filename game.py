@@ -46,9 +46,7 @@ class Game:
         self.upgrade_button_font: pygame.font.Font = pygame.font.Font(
             "font/Beyonders-6YoJM.ttf", 20
         )
-        self.font_10: pygame.font.Font = pygame.font.Font(
-            "font/Anta-Regular.ttf", 25
-        )
+        self.font_10: pygame.font.Font = pygame.font.Font("font/Anta-Regular.ttf", 25)
         self.other_font = pygame.font.Font("font/ninifont-caps.otf", 50)
         self.font_color = pygame.Color(255, 87, 51)
 
@@ -125,6 +123,16 @@ class Game:
             lambda: self.game_state == GameState["MAIN_MENU"],
             center=(1400, 50),
         )
+        self.sound_button: Button = Button(
+            (500, 100),
+            "hang",
+            self.score_font,
+            (0, 0, 0),
+            "white",
+            lambda: self.toggle_sound(),
+            lambda: self.game_state == GameState["MAIN_MENU"],
+            center=(900, 50),
+        )
         self.point_counter: Counter = Counter(
             self.game_font_smaller, "", (255, 255, 255), center=(300, 100)
         )
@@ -135,8 +143,12 @@ class Game:
         self.upgrade_cards: list[UpgradeCard] = []
         self.new_upgrades()
 
-        self.default_background: pygame.Surface = pygame.image.load("img/background/main_menu.png").convert()
-        self.laser_background: pygame.Surface = pygame.image.load("img/background/main_menu_laser.png").convert()
+        self.default_background: pygame.Surface = pygame.image.load(
+            "img/background/main_menu.png"
+        ).convert()
+        self.laser_background: pygame.Surface = pygame.image.load(
+            "img/background/main_menu_laser.png"
+        ).convert()
         self.current_background: pygame.Surface = self.default_background
         self.next_background: pygame.Surface = self.default_background
         self.background_opacity: float = 1
@@ -177,10 +189,10 @@ class Game:
                 if event.type == pygame.QUIT:
                     running = False
                 if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                    self.player.grabber.extend()
                     if self.game_state == GameState["IN_GAME"]:
-                        self.sound.extend_arm.play()
-                    Button.handle_clicks()
+                        self.player.grabber.extend()
+                    else:
+                        Button.handle_clicks()
 
                 if self.game_state == GameState["IN_GAME"]:
                     if event.type == self.meteor_spawn_event:
@@ -195,13 +207,13 @@ class Game:
                         self.laser.get_pos()
                         self.laser.show_warning = True
                         if self.game_state == GameState["IN_GAME"]:
-                            self.sound.warning.play()
+                            self.sound.play_sound(self.sound.warning)
                         pygame.time.set_timer(self.warning_timer, int(2000), 1)
                     if event.type == self.warning_timer:
                         self.laser.show_warning = False
                         self.laser.laser_go = True
                         if self.game_state == GameState["IN_GAME"]:
-                            self.sound.laser.play()
+                            self.sound.play_sound(self.sound.laser)
                         pygame.time.set_timer(self.laser_timer, int(700), 1)
                     if event.type == self.laser_timer:
                         self.laser.laser_go = False
@@ -221,7 +233,6 @@ class Game:
                                 self.sound.all_music[self.sound.music_index]
                             )
                             pygame.mixer.music.play(-1)
-                            pygame.mixer.music.set_volume(0.6)
                         elif (
                             self.game_state == GameState["IN_GAME"] and self.player.dead
                         ):
@@ -233,8 +244,6 @@ class Game:
                                 self.sound.all_music[self.sound.music_index]
                             )
                             pygame.mixer.music.play(-1)
-                            pygame.mixer.music.set_volume(0.3)
-
             keys: pygame.key.ScancodeWrapper = pygame.key.get_pressed()
             if self.game_state == GameState["IN_GAME"]:
                 self.player.rotate(
@@ -297,6 +306,7 @@ class Game:
 
                     self.upgrade_button.draw(self.screen)
                     self.laser_button.draw(self.screen)
+                    self.sound_button.draw(self.screen)
             elif self.game_state == GameState["UPGRADE_MENU"]:
                 self.screen.fill("blue")
 
@@ -347,7 +357,9 @@ class Game:
             callables: tuple[Callable[[], typing.Any], Callable[[], bool]] = (
                 self.create_callables(upgrade[0])
             )
-            upgrade_display: tuple[str, str] = self.upgrade_manager.upgrade_display[upgrade[0]]
+            upgrade_display: tuple[str, str] = self.upgrade_manager.upgrade_display[
+                upgrade[0]
+            ]
             self.upgrade_cards.append(
                 UpgradeCard(
                     (200, 300),
@@ -393,6 +405,14 @@ class Game:
         else:
             self.laser_button.bg_color = (0, 0, 0)
             self.next_background = self.default_background
+
+    def toggle_sound(self):
+        self.sound.enabled = not self.sound.enabled
+        self.sound.controll_volume()
+        if self.sound.enabled:
+            self.sound_button.bg_color = (0, 0, 0)
+        else:
+            self.sound_button.bg_color = (70, 150, 110)
 
     def change_background(self) -> None:
         self.screen.fill("black")

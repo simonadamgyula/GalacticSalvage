@@ -35,6 +35,7 @@ class Grabber:
 
         self.rotate()
         self.extension_stage = ExtensionStage["EXTENDING"]
+        self.sound.play_sound(self.sound.extend_arm)
 
     def update(self, position: pygame.Vector2) -> int:
         self.move(position)
@@ -45,6 +46,7 @@ class Grabber:
             return self.collect_debris()
         else:
             return 0
+        
 
     def move(self, position: pygame.Vector2) -> None:
         self.position = position
@@ -62,7 +64,8 @@ class Grabber:
 
         for debris in self.caught_debris:
             debris.kill()
-            self.sound.collect.play()
+            self.sound.play_sound(self.sound.collect)
+
         self.caught_debris = []
 
         return points
