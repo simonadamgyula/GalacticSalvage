@@ -87,6 +87,27 @@ class Game:
         self.screen_note: bool = False
         self.settings_screen: bool = False
 
+        self.help_text: Text = Text(
+            "Galactic Salvage",
+            self.setting_font,
+            (255, 255, 255),
+            topleft=(800, 330),
+        )
+        self.title_text: Text = Text(
+            "Galactic Salvage",
+            self.game_font,
+            (255, 255, 255),
+            center=(800, 330),
+        )
+        self.run_text: Text = Text(
+            "Nyomd meg a szóközt az indításhoz!",
+            self.game_font_smaller,
+            (255, 255, 255),
+            center=(800, 470),
+        )
+        self.death_text: Text = Text(
+            "Meghaltál!", self.game_font, (255, 81, 81), center=(800, 450)
+        )
         self.laser_button_text: Text = Text(
             "Ezzel a beállítással lézereket kapcsolsz be ,amelyek folyamtosan\nnehezíteni fogják a játékot, cserébe 10 pont helyett 15 pontot fogsz\nmajd kapni. A lézerek véletlenszerü helyeken jönnek, és a 10. lézer\nután már kettö darabot kell kerülgetni egyszerre. ",
             self.setting_font,
@@ -201,14 +222,6 @@ class Game:
     def run(self) -> None:
         # main menu
         bg_surf: pygame.Surface = self.background_generate()
-        title_surf: pygame.Surface = self.game_font.render(
-            "Galactic Salvage", True, "white"
-        )
-        title_rect: pygame.Rect = title_surf.get_rect(center=(800, 330))
-        run_surf: pygame.Surface = self.game_font_smaller.render(
-            "Nyomd meg a szóközt az indításhoz!", True, "white"
-        )
-        run_rect: pygame.Rect = run_surf.get_rect(center=(800, 470))
 
         pygame.time.set_timer(
             self.meteor_spawn_event, int(1000 / self.meteorite_spawn_rate)
@@ -216,11 +229,6 @@ class Game:
         pygame.time.set_timer(
             self.debris_spawn_event, int(1000 / self.debris_spawn_rate)
         )
-
-        text_surf: pygame.Surface = self.game_font.render(
-            "Meghaltál!", True, self.font_color
-        )
-        text_rect: pygame.Rect = text_surf.get_rect(center=(1600 / 2, 900 / 2))
 
         pygame.mixer.music.load(self.sound.all_music[self.sound.music_index])
         pygame.mixer.music.set_volume(0.3)
@@ -301,7 +309,7 @@ class Game:
                 Debris.debris_group.update(screen=self.screen)  # type: ignore
 
                 if self.player.dead:
-                    self.screen.blit(text_surf, text_rect)
+                    self.death_text.draw(self.screen)
 
                 if self.laser.enabled:
                     self.point_multiplier = 15
@@ -334,9 +342,7 @@ class Game:
                 self.settings_button.draw(self.screen)
 
                 if self.screen_note:
-                    pygame.draw.rect(
-                        self.screen, "white", (300, 200, 1000, 500), border_radius=50
-                    )
+                    self.help_text.draw(self.screen)
                 elif self.settings_screen:
                     self.laser_button.draw(self.screen)
                     self.sound_button.draw(self.screen)
@@ -344,10 +350,9 @@ class Game:
                     self.laser_button_text.draw(self.screen)
                     self.sound_button_text.draw(self.screen)
                     self.music_button_text.draw(self.screen)
-
                 else:
-                    self.screen.blit(title_surf, title_rect)
-                    self.screen.blit(run_surf, run_rect)
+                    self.title_text.draw(self.screen)
+                    self.run_text.draw(self.screen)
 
                     self.upgrade_button.draw(self.screen)
             elif self.game_state == GameState["UPGRADE_MENU"]:
@@ -388,9 +393,13 @@ class Game:
 
     def toggle_settings_screen(self) -> None:
         self.settings_screen = not self.settings_screen
+        if self.screen_note:
+            self.screen_note = False
 
     def toggle_screen_note(self) -> None:
         self.screen_note = not self.screen_note
+        if self.settings_screen:
+            self.settings_screen = False
 
     def draw_upgrade_cards(self) -> None:
         for card in self.upgrade_cards:
