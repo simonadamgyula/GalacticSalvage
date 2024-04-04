@@ -34,22 +34,14 @@ class Game:
         self.game_state: GameState = GameState["MAIN_MENU"]
 
         self.counter_font: pygame.font.Font = pygame.font.Font(None, 200)
-        self.game_font: pygame.font.Font = pygame.font.Font(
-            "font/Beyonders-6YoJM.ttf", 80
-        )
-        self.game_font_smaller: pygame.font.Font = pygame.font.Font(
-            "font/Beyonders-6YoJM.ttf", 40
-        )
-        self.score_font: pygame.font.Font = pygame.font.Font(
-            "font/Beyonders-6YoJM.ttf", 30
-        )
-        self.upgrade_button_font: pygame.font.Font = pygame.font.Font(
-            "font/Beyonders-6YoJM.ttf", 20
-        )
-        self.setting_font: pygame.font.Font = pygame.font.Font(
-            "font/Beyonders-6YoJM.ttf", 15
-        )
+
+        self.font80: pygame.font.Font = pygame.font.Font("font/Beyonders-6YoJM.ttf", 80)
+        self.font40: pygame.font.Font = pygame.font.Font("font/Beyonders-6YoJM.ttf", 40)
+        self.font30: pygame.font.Font = pygame.font.Font("font/Beyonders-6YoJM.ttf", 30)
+        self.font20: pygame.font.Font = pygame.font.Font("font/Beyonders-6YoJM.ttf", 20)
+        self.font15: pygame.font.Font = pygame.font.Font("font/Beyonders-6YoJM.ttf", 15)
         self.font_10: pygame.font.Font = pygame.font.Font("font/Anta-Regular.ttf", 25)
+
         self.other_font = pygame.font.Font("font/ninifont-caps.otf", 50)
         self.font_color = pygame.Color(255, 87, 51)
 
@@ -79,6 +71,7 @@ class Game:
         self.current_points: int = 0
         self.points: int = 0
         self.point_multiplier: int = 10
+
 
         self.upgrade_manager: UpgradeManager = UpgradeManager({})
 
@@ -129,7 +122,7 @@ class Game:
         self.help_button: Button = Button(
             (100, 100),
             "?",
-            self.game_font_smaller,
+            self.font40,
             None,
             "white",
             lambda: self.toggle_screen_note(),
@@ -150,7 +143,8 @@ class Game:
         self.upgrade_button: Button = Button(
             (200, 100),
             "upgrade",
-            self.upgrade_button_font,
+            self.font20,
+
             (63, 63, 63),
             "white",
             lambda: self.set_game_state(GameState["UPGRADE_MENU"]),
@@ -159,19 +153,20 @@ class Game:
         )
         self.back_button: Button = Button(
             (100, 100),
-            "back",
-            self.upgrade_button_font,
+            "Back",
+            self.font20,
             (63, 63, 63),
             "white",
             lambda: self.set_game_state(GameState["MAIN_MENU"]),
             lambda: self.game_state == GameState["UPGRADE_MENU"],
             center=(100, 100),
         )
+
         self.laser_button: Button = Button(
             (500, 150),
             "lézer",
-            self.score_font,
-            (255, 81, 81),
+            self.font40,
+            (0, 0, 0),
             "white",
             lambda: self.toggle_laser(),
             lambda: self.game_state == GameState["MAIN_MENU"],
@@ -180,8 +175,8 @@ class Game:
         self.sound_button: Button = Button(
             (500, 150),
             "hang",
-            self.score_font,
-            (70, 150, 110),
+            self.font40,
+            (0, 0, 0),
             "white",
             lambda: self.toggle_sound(),
             lambda: self.game_state == GameState["MAIN_MENU"],
@@ -198,10 +193,10 @@ class Game:
             center=(300, 700),
         )
         self.point_counter: Counter = Counter(
-            self.game_font_smaller, "", (255, 255, 255), center=(300, 100)
+            self.font40, "", (255, 255, 255), center=(300, 100)
         )
         self.in_game_counter: Counter = Counter(
-            self.score_font, "Jelenlegi pontszámod: ", (255, 255, 255), topleft=(20, 20)
+            self.font30, "Jelenlegi pontszámod: ", (255, 255, 255), topleft=(20, 20)
         )
 
         self.upgrade_cards: list[UpgradeCard] = []
@@ -222,12 +217,42 @@ class Game:
     def run(self) -> None:
         # main menu
         bg_surf: pygame.Surface = self.background_generate()
+        title_surf: pygame.Surface = self.font80.render(
+            "Galactic Salvage", True, "white"
+        )
+        title_rect: pygame.Rect = title_surf.get_rect(center=(800, 330))
+        run_surf: pygame.Surface = self.font40.render(
+            "Indításhoz nyomd meg a szóközt!", True, "white"
+        )
+        run_rect: pygame.Rect = run_surf.get_rect(center=(800, 470))
+
+        button_surf: pygame.Surface = pygame.Surface((100, 100))
+        button_rect: pygame.Rect = pygame.Rect(50, 50, 100, 100)
+
+        button_text: pygame.Surface = self.font40.render("?", True, "white")
+        button_text_rect: pygame.Rect = button_text.get_rect(
+            center=(button_surf.get_width() / 2, button_surf.get_height() / 2)
+        )
+        screen_note: bool = False
 
         pygame.time.set_timer(
             self.meteor_spawn_event, int(1000 / self.meteorite_spawn_rate)
         )
         pygame.time.set_timer(
             self.debris_spawn_event, int(1000 / self.debris_spawn_rate)
+        )
+
+        pygame.time.set_timer(self.warning_spawn, int(9000))
+
+        text_surf: pygame.Surface = self.font80.render(
+            "Meghaltál!", True, self.font_color
+        )
+        text_rect: pygame.Rect = text_surf.get_rect(center=(1600 / 2, 900 / 2))
+        play_again_surf: pygame.Surface = self.font20.render(
+            "Visszalépéshez nyomd meg szóközt!", True, "white"
+        )
+        play_again_rect: pygame.Rect = play_again_surf.get_rect(
+            center=(1600 / 2, 900 / 2 + 100)
         )
 
         pygame.mixer.music.load(self.sound.all_music[self.sound.music_index])
@@ -277,6 +302,7 @@ class Game:
                         )  # első lézer 9sec
                         if self.game_state == GameState["MAIN_MENU"]:
                             self.set_game_state(GameState["IN_GAME"])
+
                             pygame.mixer.music.stop()
                             self.sound.music_index += 1
                             self.sound.music_index_controll()
@@ -309,7 +335,8 @@ class Game:
                 Debris.debris_group.update(screen=self.screen)  # type: ignore
 
                 if self.player.dead:
-                    self.death_text.draw(self.screen)
+                    self.screen.blit(text_surf, text_rect)
+                    self.screen.blit(play_again_surf, play_again_rect)
 
                 if self.laser.enabled:
                     self.point_multiplier = 15
@@ -333,6 +360,9 @@ class Game:
                     and self.laser.laser_go
                 ):
                     self.player.die()
+
+                self.in_game_counter.update(self.current_points)
+                self.in_game_counter.draw(self.screen)
 
                 self.laser.update(self.screen)
             elif self.game_state == GameState["MAIN_MENU"]:
@@ -423,7 +453,7 @@ class Game:
                     (200, 300),
                     upgrade_display[0],
                     upgrade[2],
-                    self.upgrade_button_font,
+                    self.font20,
                     f"img/upgrades/{upgrade[0]}.png",
                     "black",
                     "white",

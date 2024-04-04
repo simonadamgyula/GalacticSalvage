@@ -9,6 +9,7 @@ from sound import Sound
 class Button:
     buttons: list["Button"] = []
 
+
     def __init__(
         self,
         size: tuple[int, int],
