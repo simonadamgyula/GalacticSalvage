@@ -72,7 +72,6 @@ class Game:
         self.points: int = 0
         self.point_multiplier: int = 10
 
-
         self.upgrade_manager: UpgradeManager = UpgradeManager({})
 
         self.player.load_upgrades(self.upgrade_manager.get_upgrade_values)
@@ -82,40 +81,40 @@ class Game:
 
         self.help_text: Text = Text(
             "A ürhajó mozgását  a WASD billentyükkel vagy a nyilakkal irányítod,\n\na karját pedig abal egérkattintással. A célod minél több ürszemetet\n\nösszeszedni, miközben kerülgeted a meteorokat és póbálsz a pályán\n\nbelül maradni. Minden eggyes darab ürroncs után pontokat\n\nfogsz kapni amit fejlesztésekre tudsz elkölteni a menüben.\n\n\n\nHa túl könnyü a játék a beállítások között lézereket is tudsz\n\nbekapcsolni",
-            self.upgrade_button_font,
+            self.font20,
             (255, 255, 255),
             topleft=(175, 250),
         )
         self.title_text: Text = Text(
             "Galactic Salvage",
-            self.game_font,
+            self.font80,
             (255, 255, 255),
             center=(800, 330),
         )
         self.run_text: Text = Text(
             "Nyomd meg a szóközt az indításhoz!",
-            self.game_font_smaller,
+            self.font40,
             (255, 255, 255),
             center=(800, 470),
         )
         self.death_text: Text = Text(
-            "Meghaltál!", self.game_font, (255, 81, 81), center=(800, 450)
+            "Meghaltál!", self.font80, (255, 81, 81), center=(800, 450)
         )
         self.laser_button_text: Text = Text(
             "Ezzel a beállítással lézereket kapcsolsz be ,amelyek folyamtosan\nnehezíteni fogják a játékot, cserébe 10 pont helyett 15 pontot fogsz\nmajd kapni. A lézerek véletlenszerü helyeken jönnek, és a 10. lézer\nután már kettö darabot kell kerülgetni egyszerre. ",
-            self.setting_font,
+            self.font15,
             (255, 255, 255),
             topleft=(575, 290),
         )
         self.sound_button_text: Text = Text(
             "Minden háttérzenén kívüi hang ki -bekapcsolása.",
-            self.setting_font,
+            self.font15,
             (255, 255, 255),
             topleft=(575, 510),
         )
         self.music_button_text: Text = Text(
             "Háttérzene ki -bekapcsolása.",
-            self.setting_font,
+            self.font15,
             (255, 255, 255),
             topleft=(575, 685),
         )
@@ -132,7 +131,7 @@ class Game:
         self.settings_button: Button = Button(
             (400, 100),
             "settings",
-            self.score_font,
+            self.font30,
             None,
             "white",
             lambda: self.toggle_settings_screen(),
@@ -185,7 +184,7 @@ class Game:
         self.music_button: Button = Button(
             (500, 150),
             "zene",
-            self.score_font,
+            self.font40,
             (70, 150, 110),
             "white",
             lambda: self.toggle_music(),
