@@ -37,16 +37,8 @@ class Player:
         self.deceleration: float = 0.02
         self.max_velocity: float = 3
 
-        self.images_nmoving: list[pygame.Surface] = []
-        self.images_nmoving.append(pygame.image.load("img/spaceship/not_moving/1.png"))
-        self.images_nmoving.append(pygame.image.load("img/spaceship/not_moving/2.png"))
-
-        self.images: list[pygame.Surface] = []
-        self.images.append(pygame.image.load("img/spaceship/moving/1.png"))
-        self.images.append(pygame.image.load("img/spaceship/moving/2.png"))
-        self.images.append(pygame.image.load("img/spaceship/moving/3.png"))
-        self.images.append(pygame.image.load("img/spaceship/moving/4.png"))
-        self.images.append(pygame.image.load("img/spaceship/moving/5.png"))
+        self.nmoving_anim: Animation = Animation.import_spritesheet("img/spaceship/not_moving.png", 72, 120, 0.2, True)
+        self.moving_anim: Animation = Animation.import_spritesheet("img/spaceship/moving.png", 72, 120, 0.3, True)
 
         self.death_animation: Animation = Animation.import_spritesheet(
             "img/explosion.png", 224, 224, 0.2, False
@@ -61,11 +53,7 @@ class Player:
             "img/spaceship/shield/shield_break.png", 132, 132, 0.2, False
         )
 
-        self.frame_index = 0
-        self.animation_speed: float = 0.3
-        self.animation_speed_nmoving: float = 0.2
-
-        self.image: pygame.Surface = self.images_nmoving[self.frame_index]
+        self.image: pygame.Surface = self.nmoving_anim.next()
 
         self.moving = False
         self.can_slow_down: bool = False
@@ -144,15 +132,9 @@ class Player:
 
     def animate(self):
         if not self.moving:
-            self.frame_index += self.animation_speed_nmoving
-            if self.frame_index >= len(self.images_nmoving):
-                self.frame_index = 0
-            self.image = self.images_nmoving[int(self.frame_index)]
+            self.image = self.nmoving_anim.next()
         else:
-            self.frame_index += self.animation_speed
-            if self.frame_index >= len(self.images):
-                self.frame_index = 0
-            self.image = self.images[int(self.frame_index)]
+            self.image = self.moving_anim.next()
 
         self.moving = False
 
