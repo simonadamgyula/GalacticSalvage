@@ -37,8 +37,10 @@ class Player:
         self.deceleration: float = 0.02
         self.max_velocity: float = 3
 
-        self.nmoving_anim: Animation = Animation.import_spritesheet("img/spaceship/not_moving.png", 72, 120, 0.2, True)
-        self.moving_anim: Animation = Animation.import_spritesheet("img/spaceship/moving.png", 72, 120, 0.3, True)
+        self.nmoving_anim: Animation = Animation.import_spritesheet("img/spaceship/default/not_moving.png", 72, 120,
+                                                                    0.2, True)
+        self.moving_anim: Animation = Animation.import_spritesheet("img/spaceship/default/moving.png", 72, 120,
+                                                                   0.3, True)
 
         self.death_animation: Animation = Animation.import_spritesheet(
             "img/explosion.png", 224, 224, 0.2, False
@@ -221,6 +223,17 @@ class Player:
         self.grabber.extension_speed = upgrades["grabber_speed"]
         self.can_slow_down = bool(upgrades["can_slow_down"])
         self.grabber.update_length(upgrades["grabber_length"])
+
+        if upgrades["ee"]:
+            self.nmoving_anim: Animation = Animation.import_spritesheet("img/spaceship/ee/not_moving.png", 72, 120,
+                                                                        0.2, True)
+            self.moving_anim: Animation = Animation.import_spritesheet("img/spaceship/ee/moving.png", 72, 120,
+                                                                       0.3, True)
+        else:
+            self.nmoving_anim: Animation = Animation.import_spritesheet("img/spaceship/default/not_moving.png", 72, 120,
+                                                                        0.2, True)
+            self.moving_anim: Animation = Animation.import_spritesheet("img/spaceship/default/moving.png", 72, 120,
+                                                                       0.3, True)
 
         self.max_shield = int(upgrades["shield"])
         self.shield = copy(self.max_shield)
