@@ -79,6 +79,12 @@ class Game:
         self.screen_note: bool = False
         self.settings_screen: bool = False
 
+        self.play_again_text: Text = Text(
+            "Visszalépéshez nyomd meg szóközt!",
+            self.font20,
+            (255, 255, 255),
+            center=(800, 550),
+        )
         self.help_text: Text = Text(
             "A ürhajó mozgását  a WASD billentyükkel vagy a nyilakkal irányítod,\n\na karját pedig abal egérkattintással. A célod minél több ürszemetet\n\nösszeszedni, miközben kerülgeted a meteorokat és póbálsz a pályán\n\nbelül maradni. Minden eggyes darab ürroncs után pontokat\n\nfogsz kapni amit fejlesztésekre tudsz elkölteni a menüben.\n\n\n\nHa túl könnyü a játék a beállítások között lézereket is tudsz\n\nbekapcsolni",
             self.font20,
@@ -143,7 +149,6 @@ class Game:
             (200, 100),
             "upgrade",
             self.font20,
-
             (63, 63, 63),
             "white",
             lambda: self.set_game_state(GameState["UPGRADE_MENU"]),
@@ -165,7 +170,7 @@ class Game:
             (500, 150),
             "lézer",
             self.font40,
-            (0, 0, 0),
+            (255, 81, 81),
             "white",
             lambda: self.toggle_laser(),
             lambda: self.game_state == GameState["MAIN_MENU"],
@@ -175,7 +180,7 @@ class Game:
             (500, 150),
             "hang",
             self.font40,
-            (0, 0, 0),
+            (255, 81, 81),
             "white",
             lambda: self.toggle_sound(),
             lambda: self.game_state == GameState["MAIN_MENU"],
@@ -216,23 +221,6 @@ class Game:
     def run(self) -> None:
         # main menu
         bg_surf: pygame.Surface = self.background_generate()
-        title_surf: pygame.Surface = self.font80.render(
-            "Galactic Salvage", True, "white"
-        )
-        title_rect: pygame.Rect = title_surf.get_rect(center=(800, 330))
-        run_surf: pygame.Surface = self.font40.render(
-            "Indításhoz nyomd meg a szóközt!", True, "white"
-        )
-        run_rect: pygame.Rect = run_surf.get_rect(center=(800, 470))
-
-        button_surf: pygame.Surface = pygame.Surface((100, 100))
-        button_rect: pygame.Rect = pygame.Rect(50, 50, 100, 100)
-
-        button_text: pygame.Surface = self.font40.render("?", True, "white")
-        button_text_rect: pygame.Rect = button_text.get_rect(
-            center=(button_surf.get_width() / 2, button_surf.get_height() / 2)
-        )
-        screen_note: bool = False
 
         pygame.time.set_timer(
             self.meteor_spawn_event, int(1000 / self.meteorite_spawn_rate)
@@ -242,17 +230,6 @@ class Game:
         )
 
         pygame.time.set_timer(self.warning_spawn, int(9000))
-
-        text_surf: pygame.Surface = self.font80.render(
-            "Meghaltál!", True, self.font_color
-        )
-        text_rect: pygame.Rect = text_surf.get_rect(center=(1600 / 2, 900 / 2))
-        play_again_surf: pygame.Surface = self.font20.render(
-            "Visszalépéshez nyomd meg szóközt!", True, "white"
-        )
-        play_again_rect: pygame.Rect = play_again_surf.get_rect(
-            center=(1600 / 2, 900 / 2 + 100)
-        )
 
         pygame.mixer.music.load(self.sound.all_music[self.sound.music_index])
         pygame.mixer.music.set_volume(0.3)
@@ -334,8 +311,8 @@ class Game:
                 Debris.debris_group.update(screen=self.screen)  # type: ignore
 
                 if self.player.dead:
-                    self.screen.blit(text_surf, text_rect)
-                    self.screen.blit(play_again_surf, play_again_rect)
+                    self.play_again_text.draw(self.screen)
+                    self.death_text.draw(self.screen)
 
                 if self.laser.enabled:
                     self.point_multiplier = 15
@@ -385,8 +362,8 @@ class Game:
 
                     self.upgrade_button.draw(self.screen)
             elif self.game_state == GameState["UPGRADE_MENU"]:
-                self.screen.fill("blue")
-
+                self.change_background()
+                self.screen.blit(self.current_background, (0, 0))
                 self.point_counter.update(self.points)
                 self.point_counter.draw(self.screen)
 
