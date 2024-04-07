@@ -9,7 +9,6 @@ from sound import Sound
 class Button:
     buttons: list["Button"] = []
 
-
     def __init__(
         self,
         size: tuple[int, int],
@@ -58,9 +57,9 @@ class Button:
         if self.usage == 0:
             self.sound.play_sound(self.sound.wrong_button)
             return
-        self.usage -= 1 if self.usage > 0 else 0
 
         if self.active():
+            self.usage -= 1 if self.usage > 0 else 0
             self.sound.play_sound(self.sound.button)
             return self.function()
 
@@ -70,6 +69,10 @@ class Button:
         for button in Button.buttons:
             if button.rect.collidepoint(mouse_pos):
                 button.click()
+
+    @staticmethod
+    def delete_button(button: "Button") -> None:
+        Button.buttons.remove(button)
 
 
 class Image:
@@ -151,10 +154,10 @@ class UpgradeCard:
 
         self.image: Image = Image(image, float(2), center=position)  # type: ignore
         self.name: Text = Text(text, font, font_color, center=(position[0], position[1] + 100))  # type: ignore
-        self.price_text: Text = Text(f"Price: {price}", font, font_color, center=(position[0], position[1] + 200))
+        self.price_text: Text = Text(f"Ár: {price}", font, font_color, center=(position[0], position[1] + 200))
         self.description: Text = Text(description, description_font, "white", center=(position[0], position[1] + 270))
-        self.button: Button = Button((100, 50),
-                                     "Buy", font, color, font_color, function, active=active,
+        self.button: Button = Button((190, 50),
+                                     "Vásárlás", font, color, font_color, function, active=active,
                                      usage=1, disabled_color=disabled_color, center=(position[0], position[1] + 400))
 
     def draw(self, screen: pygame.Surface) -> None:
@@ -163,3 +166,6 @@ class UpgradeCard:
         self.price_text.draw(screen)
         self.description.draw(screen)
         self.button.draw(screen)
+
+    def remove(self) -> None:
+        Button.delete_button(self.button)
