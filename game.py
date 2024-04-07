@@ -130,7 +130,7 @@ class Game:
         )
         self.settings_button: Button = Button(
             (400, 100),
-            "settings",
+            "beállítások",
             self.font30,
             None,
             "white",
@@ -310,9 +310,11 @@ class Game:
                             )
                             pygame.mixer.music.play(-1)
                         elif (
-                            self.game_state == GameState["IN_GAME"] and self.player.dead
+                                self.game_state == GameState["IN_GAME"] and self.player.dead
                         ):
                             self.reset()
+                    if event.key == pygame.K_r and self.game_state == GameState["UPGRADE_MENU"]:
+                        self.new_upgrades()
             keys: pygame.key.ScancodeWrapper = pygame.key.get_pressed()
             if self.game_state == GameState["IN_GAME"]:
                 self.player.rotate(
@@ -351,12 +353,12 @@ class Game:
                 self.player.draw(self.screen)
 
                 if (
-                    self.player.check_kill_collision(
-                        self.laser.kill_rect,
-                        self.laser.kill_rect_ver,
-                        self.laser.direction,
-                    )
-                    and self.laser.laser_go
+                        self.player.check_kill_collision(
+                            self.laser.kill_rect,
+                            self.laser.kill_rect_ver,
+                            self.laser.direction,
+                        )
+                        and self.laser.laser_go
                 ):
                     self.player.die()
 
@@ -401,12 +403,16 @@ class Game:
 
     def reset(self) -> None:
         self.player.reset()
+
+        for upgrade_card in self.upgrade_cards:
+            upgrade_card.remove()
         self.new_upgrades()
+
         self.set_game_state(GameState["MAIN_MENU"])
         Meteorite.meteorites.empty()
         Debris.debris_group.empty()
 
-        self.points += self.current_points
+        self.points += self.current_points * (1 + self.upgrade_manager.get_upgrade_values["ee"])
         self.current_points = 0
 
         self.laser.all_laser = 0
@@ -447,6 +453,7 @@ class Game:
             upgrade_display: tuple[str, str] = self.upgrade_manager.upgrade_display[
                 upgrade[0]
             ]
+            callables[1]()
             self.upgrade_cards.append(
                 UpgradeCard(
                     (200, 300),
@@ -466,7 +473,7 @@ class Game:
 
     # don't know why this is needed, but doesn't work without it
     def create_callables(
-        self, upgrade_name: str
+            self, upgrade_name: str
     ) -> tuple[Callable[[], typing.Any], Callable[[], bool]]:
         return (
             lambda: self.try_buy(upgrade_name),

@@ -87,12 +87,15 @@ class UpgradeManager:
 
         cost: int = self.upgrade_cost[upgrade_name][self.upgrades[upgrade_name]]
         self.upgrades[upgrade_name] += 1
+
+        print("Bought upgrade", upgrade_name, "for", cost, "points")
+
         return cost
 
     def get_random_upgrades(self, amount: int) -> list[tuple[str, int, int]]:
         upgrades: set[tuple[str, int, int]] = set()
 
-        ee: bool = random.randint(1, 3) == 0
+        ee: bool = random.randint(0, 4) == 0
 
         limit: int = 100
         while len(upgrades) < amount and limit > 0:
