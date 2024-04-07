@@ -180,7 +180,7 @@ class Game:
             (500, 150),
             "hang",
             self.font40,
-            (255, 81, 81),
+            (70, 150, 110),
             "white",
             lambda: self.toggle_sound(),
             lambda: self.settings_screen,
@@ -228,8 +228,6 @@ class Game:
         pygame.time.set_timer(
             self.debris_spawn_event, int(1000 / self.debris_spawn_rate)
         )
-
-        pygame.time.set_timer(self.warning_spawn, int(9000))
 
         pygame.mixer.music.load(self.sound.all_music[self.sound.music_index])
         pygame.mixer.music.set_volume(0.3)
@@ -469,7 +467,7 @@ class Game:
         bg_surf = pygame.image.load("img/background/space.png").convert_alpha()
         return bg_surf
 
-    def toggle_laser(self):
+    def toggle_laser(self) -> None:
         self.laser.enabled = not self.laser.enabled
         if self.laser.enabled:
             self.laser_button.bg_color = (70, 150, 110)
@@ -478,14 +476,14 @@ class Game:
             self.laser_button.bg_color = (255, 81, 81)
             self.next_background = self.default_background
 
-    def toggle_sound(self):
+    def toggle_sound(self) -> None:
         self.sound.enabled = not self.sound.enabled
         if self.sound.enabled:
             self.sound_button.bg_color = (70, 150, 110)
         else:
             self.sound_button.bg_color = (255, 81, 81)
 
-    def toggle_music(self):
+    def toggle_music(self) -> None:
         self.sound.music_enabled = not self.sound.music_enabled
         self.sound.controll_volume()
         if self.sound.music_enabled:
