@@ -39,8 +39,6 @@ class Button:
         self.function: Callable[[], typing.Any] = function
         self.active: Callable[[], bool] = active
 
-        self.debug = text
-
         Button.buttons.append(self)
 
         self.sound = Sound()
@@ -59,9 +57,9 @@ class Button:
         if self.usage == 0:
             self.sound.play_sound(self.sound.wrong_button)
             return
-        self.usage -= 1 if self.usage > 0 else 0
 
         if self.active():
+            self.usage -= 1 if self.usage > 0 else 0
             self.sound.play_sound(self.sound.button)
             return self.function()
 
@@ -70,7 +68,6 @@ class Button:
         mouse_pos: tuple[int, int] = pygame.mouse.get_pos()
         for button in Button.buttons:
             if button.rect.collidepoint(mouse_pos):
-                print(button.debug)
                 button.click()
 
     @staticmethod
