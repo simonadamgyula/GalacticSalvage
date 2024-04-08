@@ -230,11 +230,12 @@ class Game:
         )
 
         pygame.mixer.music.load(self.sound.all_music[self.sound.music_index])
-        pygame.mixer.music.set_volume(0.3)
+        self.sound.controll_volume()
         pygame.mixer.music.play(-1)
 
         running: bool = True
         while running:
+            print(pygame.mixer.music.get_volume())
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
@@ -485,7 +486,6 @@ class Game:
 
     def toggle_music(self) -> None:
         self.sound.music_enabled = not self.sound.music_enabled
-        self.sound.controll_volume()
         if self.sound.music_enabled:
             self.music_button.bg_color = (70, 150, 110)
         else:
@@ -507,6 +507,11 @@ class Game:
         save_dict: dict[str, int | dict[str, int]] = {
             "points": self.points,
             "upgrades": self.upgrade_manager.upgrades,
+            "settings": {
+                "laser": self.laser.enabled,
+                "sound": self.sound.enabled,
+                "music": self.sound.music_enabled,
+            }
         }
         with open("saves.json", "w", encoding="utf-8") as file:
             json.dump(save_dict, file)
@@ -521,3 +526,11 @@ class Game:
         self.points = load_dict.get("points", 0)
         self.upgrade_manager = UpgradeManager(load_dict.get("upgrades", {}))
         self.player.load_upgrades(self.upgrade_manager.get_upgrade_values)
+
+        settings: dict[str, bool] = load_dict.get("settings", {})
+        self.laser.enabled = not settings.get("laser", False)
+        self.toggle_laser()
+        self.sound.enabled = not settings.get("sound", True)
+        self.toggle_sound()
+        self.sound.music_enabled = not settings.get("music", True)
+        self.toggle_music()
