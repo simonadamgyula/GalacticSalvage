@@ -22,7 +22,8 @@ class Game:
         pygame.init()
 
         pygame.display.set_caption("Galactic Salvage")
-        self.screen_resolution: tuple[int, int] = (1600, 900)
+        res = pygame.display.Info()
+        self.screen_resolution: tuple[int, int] = (min(1600, res.current_w), min(900, res.current_h))
 
         self.screen: pygame.Surface = pygame.display.set_mode(self.screen_resolution)
         self.clock: pygame.time.Clock = pygame.time.Clock()
@@ -83,7 +84,7 @@ class Game:
             "Visszalépéshez nyomd meg szóközt!",
             self.font20,
             (255, 255, 255),
-            center=(800, 550),
+            center=(int(self.screen_resolution[0] / 2), 550),
         )
         self.help_text: Text = Text(
             "A ürhajó mozgását  a WASD billentyükkel vagy a nyilakkal irányítod,\n\na karját pedig abal egérkattintással. A célod minél több ürszemetet\n\nösszeszedni, miközben kerülgeted a meteorokat és póbálsz a pályán\n\nbelül maradni. Minden eggyes darab ürroncs után pontokat\n\nfogsz kapni amit fejlesztésekre tudsz elkölteni a menüben.\n\n\n\nHa túl könnyü a játék a beállítások között lézereket is tudsz\n\nbekapcsolni",
@@ -95,13 +96,13 @@ class Game:
             "Galactic Salvage",
             self.font80,
             (255, 255, 255),
-            center=(800, 330),
+            center=(int(self.screen_resolution[0] / 2), 330),
         )
         self.run_text: Text = Text(
             "Nyomd meg a szóközt az indításhoz!",
             self.font40,
             (255, 255, 255),
-            center=(800, 470),
+            center=(int(self.screen_resolution[0] / 2), 470),
         )
         self.death_text: Text = Text(
             "Meghaltál!", self.font80, (255, 81, 81), center=(800, 450)
@@ -142,7 +143,7 @@ class Game:
             "white",
             lambda: self.toggle_settings_screen(),
             lambda: self.game_state == GameState["MAIN_MENU"],
-            center=(1400, 75),
+            center=(self.screen_resolution[0] - 200, 75),
         )
 
         self.upgrade_button: Button = Button(
@@ -153,7 +154,7 @@ class Game:
             "white",
             lambda: self.set_game_state(GameState["UPGRADE_MENU"]),
             lambda: self.game_state == GameState["MAIN_MENU"],
-            center=(800, 750),
+            center=(int(self.screen_resolution[0] / 2), 750),
         )
         self.back_button: Button = Button(
             (100, 100),
@@ -235,7 +236,6 @@ class Game:
 
         running: bool = True
         while running:
-            print(pygame.mixer.music.get_volume())
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
@@ -386,7 +386,7 @@ class Game:
         Meteorite.meteorites.empty()
         Debris.debris_group.empty()
 
-        self.points += self.current_points * (1 + self.upgrade_manager.get_upgrade_values["ee"])
+        self.points += self.current_points * int(1 + self.upgrade_manager.get_upgrade_values["ee"])
         self.current_points = 0
 
         self.laser.all_laser = 0
