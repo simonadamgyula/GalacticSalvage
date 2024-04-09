@@ -160,8 +160,8 @@ class Game:
             center=(int(self.screen_resolution[0] / 2), 750),
         )
         self.back_button: Button = Button(
-            (100, 100),
-            "Back",
+            (150, 100),
+            "vissza",
             self.font20,
             (63, 63, 63),
             "white",
