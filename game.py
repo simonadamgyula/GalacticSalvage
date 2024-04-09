@@ -145,19 +145,20 @@ class Game:
             "Meghaltál!", self.font80, (255, 81, 81), center=(800, 450)
         )
         self.laser_button_text: Text = Text(
-            "Ezzel a beállítással lézereket kapcsolsz be ,amelyek folyamtosan\nnehezíteni fogják a játékot, cserébe 10 pont helyett 15 pontot fogsz\nmajd kapni. A lézerek véletlenszerü helyeken jönnek, és a 10. lézer\nután már kettö darabot kell kerülgetni egyszerre. ",
+            "Lézerek ki- és bekapcsolása.\nA játék során plusz pontokat kaphatsz, \nha vállalod ezt a nehezítést.\nA 10. lézer után már egyszerre 2-vel találkozhatsz.",
             self.font15,
             (255, 255, 255),
             topleft=(575, 290),
+            #"Ezzel a beállítással lézereket kapcsolsz be, amelyek folyamatosan\nnehezíteni fogják a játékot, cserébe 10 pont helyett 15 pontot fogsz\nmajd kapni. A lézerek véletlenszerü helyeken jönnek, és a 10. lézer\nután már kettö darabot kell kerülgetni egyszerre. "
         )
         self.sound_button_text: Text = Text(
-            "Minden háttérzenén kívüi hang ki -bekapcsolása.",
+            "Háttérzene kivételével minden hang ki- és bekapcsolása.",
             self.font15,
             (255, 255, 255),
             topleft=(575, 510),
         )
         self.music_button_text: Text = Text(
-            "Háttérzene ki -bekapcsolása.",
+            "Háttérzene ki- és bekapcsolása.",
             self.font15,
             (255, 255, 255),
             topleft=(575, 685),
