@@ -42,7 +42,6 @@ class Game:
         self.font15: pygame.font.Font = pygame.font.Font("font/Beyonders-6YoJM.ttf", 15)
         self.font_10: pygame.font.Font = pygame.font.Font("font/Anta-Regular.ttf", 25)
 
-        self.other_font = pygame.font.Font("font/ninifont-caps.otf", 50)
         self.font_color = pygame.Color(255, 87, 51)
 
         self.meteorite_spawn_rate: float = 0.5  # hány darab keletkezzen másodpercenként
