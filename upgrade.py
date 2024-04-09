@@ -88,8 +88,6 @@ class UpgradeManager:
         cost: int = self.upgrade_cost[upgrade_name][self.upgrades[upgrade_name]]
         self.upgrades[upgrade_name] += 1
 
-        print("Bought upgrade", upgrade_name, "for", cost, "points")
-
         return cost
 
     def get_random_upgrades(self, amount: int) -> list[tuple[str, int, int]]:
