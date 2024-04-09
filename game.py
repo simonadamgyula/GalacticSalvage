@@ -122,7 +122,7 @@ class Game:
             ">>",
             self.font30,
             (0, 0, 0),
-            center=(800, 580)
+            center=(920, 590)
         )
         self.play_again_text: Text = Text(
             "Visszalépéshez nyomd meg szóközt!",
@@ -395,7 +395,7 @@ class Game:
                     self.screen.blit(self.wasd, [250, 400])
                     self.screen.blit(self.arrows, [250, 570])
                     self.screen.blit(self.ss_debris, [550, 300])
-                    self.screen.blit(self.collision, [540, 500])
+                    self.screen.blit(self.collision, [670, 520])
                     
 
                     self.text1.draw(self.screen)
