@@ -23,7 +23,10 @@ class Game:
 
         pygame.display.set_caption("Galactic Salvage")
         res = pygame.display.Info()
-        self.screen_resolution: tuple[int, int] = (min(1600, res.current_w), min(900, res.current_h))
+        self.screen_resolution: tuple[int, int] = (
+            min(1600, res.current_w),
+            min(900, res.current_h),
+        )
 
         self.screen: pygame.Surface = pygame.display.set_mode(self.screen_resolution)
         self.clock: pygame.time.Clock = pygame.time.Clock()
@@ -147,8 +150,8 @@ class Game:
         )
 
         self.upgrade_button: Button = Button(
-            (200, 100),
-            "upgrade",
+            (250, 100),
+            "fejlesztés",
             self.font20,
             (63, 63, 63),
             "white",
@@ -157,8 +160,8 @@ class Game:
             center=(int(self.screen_resolution[0] / 2), 750),
         )
         self.back_button: Button = Button(
-            (100, 100),
-            "Back",
+            (150, 100),
+            "vissza",
             self.font20,
             (63, 63, 63),
             "white",
@@ -288,10 +291,13 @@ class Game:
                             )
                             pygame.mixer.music.play(-1)
                         elif (
-                                self.game_state == GameState["IN_GAME"] and self.player.dead
+                            self.game_state == GameState["IN_GAME"] and self.player.dead
                         ):
                             self.reset()
-                    if event.key == pygame.K_r and self.game_state == GameState["UPGRADE_MENU"]:
+                    if (
+                        event.key == pygame.K_r
+                        and self.game_state == GameState["UPGRADE_MENU"]
+                    ):
                         self.new_upgrades()
             keys: pygame.key.ScancodeWrapper = pygame.key.get_pressed()
             if self.game_state == GameState["IN_GAME"]:
@@ -331,12 +337,12 @@ class Game:
                 self.player.draw(self.screen)
 
                 if (
-                        self.player.check_kill_collision(
-                            self.laser.kill_rect,
-                            self.laser.kill_rect_ver,
-                            self.laser.direction,
-                        )
-                        and self.laser.laser_go
+                    self.player.check_kill_collision(
+                        self.laser.kill_rect,
+                        self.laser.kill_rect_ver,
+                        self.laser.direction,
+                    )
+                    and self.laser.laser_go
                 ):
                     self.player.die()
 
@@ -388,7 +394,9 @@ class Game:
         Meteorite.meteorites.empty()  # type: ignore
         Debris.debris_group.empty()  # type: ignore
 
-        self.points += self.current_points * int(1 + self.upgrade_manager.get_upgrade_values["ee"])
+        self.points += self.current_points * int(
+            1 + self.upgrade_manager.get_upgrade_values["ee"]
+        )
         self.current_points = 0
 
         self.laser.all_laser = 0
@@ -452,11 +460,12 @@ class Game:
 
     # don't know why this is needed, but doesn't work without it
     def create_callables(
-            self, upgrade_name: str
+        self, upgrade_name: str
     ) -> tuple[Callable[[], typing.Any], Callable[[], bool]]:
         return (
             lambda: self.try_buy(upgrade_name),
-            lambda: self.upgrade_manager.can_buy(upgrade_name, self.points) and self.game_state == GameState["UPGRADE_MENU"],
+            lambda: self.upgrade_manager.can_buy(upgrade_name, self.points)
+            and self.game_state == GameState["UPGRADE_MENU"],
         )
 
     def try_buy(self, upgrade_name: str) -> None:
@@ -513,7 +522,7 @@ class Game:
                 "laser": self.laser.enabled,
                 "sound": self.sound.enabled,
                 "music": self.sound.music_enabled,
-            }
+            },
         }
         with open("saves.json", "w", encoding="utf-8") as file:
             json.dump(save_dict, file)
