@@ -389,15 +389,15 @@ class Game:
 
                 if self.screen_note:
                     pygame.draw.rect(self.screen, "white", (200, 150, 1200, 600), border_radius=50)
+                    pygame.draw.rect(self.screen, "black", (500, 150, 10, 600))
+                    pygame.draw.rect(self.screen, "black", (200, 250, 1200, 10))
 
-                    
                     self.screen.blit(self.mouseleft, [290, 270])
                     self.screen.blit(self.wasd, [250, 400])
                     self.screen.blit(self.arrows, [250, 570])
                     self.screen.blit(self.ss_debris, [550, 300])
                     self.screen.blit(self.collision, [670, 520])
                     
-
                     self.text1.draw(self.screen)
                     self.text2.draw(self.screen)
                     self.text3.draw(self.screen)
