@@ -150,15 +150,15 @@ class UpgradeCard:
                  **position: tuple[int, int]) -> None:
         self.surface: pygame.Surface = pygame.Surface(size, pygame.SRCALPHA, 32).convert_alpha()
 
-        position: tuple[int, int] = position.get("center", (0, 0))
+        converted_position: tuple[int, int] = position.get("center", (0, 0))
 
-        self.image: Image = Image(image, float(2), center=position)  # type: ignore
-        self.name: Text = Text(text, font, font_color, center=(position[0], position[1] + 100))  # type: ignore
-        self.price_text: Text = Text(f"Ár: {price}", font, font_color, center=(position[0], position[1] + 200))
-        self.description: Text = Text(description, description_font, "white", center=(position[0], position[1] + 270))
+        self.image: Image = Image(image, float(2), center=converted_position)  # type: ignore
+        self.name: Text = Text(text, font, font_color, center=(converted_position[0], converted_position[1] + 100))  # type: ignore
+        self.price_text: Text = Text(f"Ár: {price}", font, font_color, center=(converted_position[0], converted_position[1] + 200))
+        self.description: Text = Text(description, description_font, "white", center=(converted_position[0], converted_position[1] + 270))
         self.button: Button = Button((190, 50),
                                      "Vásárlás", font, color, font_color, function, active=active,
-                                     usage=1, disabled_color=disabled_color, center=(position[0], position[1] + 400))
+                                     usage=1, disabled_color=disabled_color, center=(converted_position[0], converted_position[1] + 400))
 
     def draw(self, screen: pygame.Surface) -> None:
         self.image.draw(screen)

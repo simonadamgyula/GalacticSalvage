@@ -235,7 +235,6 @@ class Game:
 
         running: bool = True
         while running:
-            print(pygame.mixer.music.get_volume())
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
@@ -383,10 +382,10 @@ class Game:
         self.new_upgrades()
 
         self.set_game_state(GameState["MAIN_MENU"])
-        Meteorite.meteorites.empty()
-        Debris.debris_group.empty()
+        Meteorite.meteorites.empty()  # type: ignore
+        Debris.debris_group.empty()  # type: ignore
 
-        self.points += self.current_points * (1 + self.upgrade_manager.get_upgrade_values["ee"])
+        self.points += self.current_points * int(1 + self.upgrade_manager.get_upgrade_values["ee"])
         self.current_points = 0
 
         self.laser.all_laser = 0

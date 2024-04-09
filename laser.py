@@ -4,9 +4,8 @@ from typing import List, Tuple
 import pygame
 
 
-class Laser(pygame.sprite.Sprite):
+class Laser:
     def __init__(self, pos: Tuple[int, int], surface: pygame.Surface) -> None:
-        super().__init__()
         self.warning = pygame.image.load("./img/laser/warning.png").convert_alpha()
         self.warning_rect = self.warning.get_rect(center=pos)
 

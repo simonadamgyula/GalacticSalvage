@@ -55,7 +55,7 @@ class Player:
             "img/spaceship/shield/shield_break.png", 132, 132, 0.2, False
         )
 
-        self.image: pygame.Surface = self.nmoving_anim.next()
+        self.image: pygame.Surface | None = self.nmoving_anim.next()
 
         self.moving = False
         self.can_slow_down: bool = False
@@ -73,6 +73,9 @@ class Player:
 
     @property
     def resolution(self) -> tuple[int, int]:
+        if self.image is None:
+            return 0, 0
+
         return self.image.get_width(), self.image.get_height()
 
     def reset(self) -> None:
@@ -87,6 +90,9 @@ class Player:
     def draw(self, screen: pygame.Surface) -> None:
         if self.dead:
             self.death_animation.draw_next(screen, self.position)
+            return
+
+        if self.image is None:
             return
 
         self.grabber.draw(screen)
@@ -141,6 +147,9 @@ class Player:
         self.moving = False
 
     def get_verticies(self) -> list[pygame.Vector2]:
+        if self.image is None:
+            return []
+
         width: int = self.image.get_width()
         height: int = self.image.get_height()
 
@@ -159,6 +168,9 @@ class Player:
         return verticies
 
     def check_collision(self, meteorites: list[Meteorite]) -> bool:
+        if self.image is None:
+            return False
+
         verticies: list[pygame.Vector2] = self.get_verticies()
         for meteorite in meteorites:
             if (
@@ -222,7 +234,7 @@ class Player:
         self.rotation_speed = upgrades["rotation_speed"]
         self.grabber.extension_speed = upgrades["grabber_speed"]
         self.can_slow_down = bool(upgrades["can_slow_down"])
-        self.grabber.update_length(upgrades["grabber_length"])
+        self.grabber.update_length(int(upgrades["grabber_length"]))
 
         if upgrades["ee"]:
             self.nmoving_anim: Animation = Animation.import_spritesheet("img/spaceship/ee/not_moving.png", 72, 120,
@@ -238,8 +250,8 @@ class Player:
         self.max_shield = int(upgrades["shield"])
         self.shield = copy(self.max_shield)
 
-    def bounce_off_meteorite(self, meteorite: Meteorite) -> None:
-        if self.last_meteorite_hit is None:
+    def bounce_off_meteorite(self, meteorite: Meteorite | None) -> None:
+        if meteorite is None:
             return
 
         surface_normal: pygame.Vector2 = -(

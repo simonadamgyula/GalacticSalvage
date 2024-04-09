@@ -7,7 +7,7 @@ class Sound(object):
     _instance: Any = None
     _initialized: bool = False
 
-    def __new__(cls, *args, **kwargs) -> "Sound":
+    def __new__(cls, *args: Any, **kwargs: Any) -> "Sound":
         if cls._instance is None:
             cls._instance = super(Sound, cls).__new__(cls)
         return cls._instance
