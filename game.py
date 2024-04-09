@@ -124,20 +124,12 @@ class Game:
             (0, 0, 0),
             center=(800, 580)
         )
-        
-        
         self.play_again_text: Text = Text(
             "Visszalépéshez nyomd meg szóközt!",
             self.font20,
             (255, 255, 255),
             center=(800, 550),
         )
-        # self.help_text: Text = Text(
-        #     "A ürhajó mozgását  a WASD billentyükkel vagy a nyilakkal irányítod,\n\na karját pedig abal egérkattintással. A célod minél több ürszemetet\n\nösszeszedni, miközben kerülgeted a meteorokat és póbálsz a pályán\n\nbelül maradni. Minden eggyes darab ürroncs után pontokat\n\nfogsz kapni amit fejlesztésekre tudsz elkölteni a menüben.\n\n\n\nHa túl könnyü a játék a beállítások között lézereket is tudsz\n\nbekapcsolni",
-        #     self.font20,
-        #     (255, 255, 255),
-        #     topleft=(175, 250),
-        # )
         self.title_text: Text = Text(
             "Galactic Salvage",
             self.font80,
@@ -411,7 +403,6 @@ class Game:
                     self.text3.draw(self.screen)
                     self.text4.draw(self.screen)
                     self.text5.draw(self.screen)
-                    # self.help_text.draw(self.screen)
 
 
                 elif self.settings_screen:
