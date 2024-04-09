@@ -254,6 +254,8 @@ class Game:
                 if self.laser.enabled:
                     if self.laser.all_laser >= 10:
                         self.laser.two_laser = True
+                    else:
+                        self.laser.two_laser = False
                     if event.type == self.warning_spawn:
                         self.laser.get_pos()
                         self.laser.show_warning = True
