@@ -88,6 +88,12 @@ class Game:
         self.mouseleft : pygame.Surface = pygame.image.load("img/how to play elements/mouse_left.png")
         self.mouseleft : pygame.Surface = pygame.transform.rotozoom(self.mouseleft, 0, 0.17)
         
+        self.mouseleft : pygame.Surface = pygame.image.load("img/how to play elements/mouse_left.png")
+        self.mouseleft : pygame.Surface = pygame.transform.rotozoom(self.mouseleft, 0, 0.17)
+
+        self.ss_debris : pygame.Surface = pygame.image.load("img/how to play elements/spaceship_and_debris.png")
+        self.collision : pygame.Surface = pygame.image.load("img/how to play elements/collision.png")
+
         self.text1 : Text = Text(
             "Irányítás",
             self.font30,
@@ -100,16 +106,24 @@ class Game:
             (0, 0, 0),
             center=(335, 540)
         )
-        self.text3 : Text =Text (
+        self.text3 : Text = Text (
             "Játék menete",
             self.font30,
             (0, 0, 0),
             center=(900, 210)
         )
-        
-        
-        
-        
+        self.text4 : Text = Text(
+            ">>   + pont",
+            self.font30,
+            (0, 0, 0),
+            center=(1170, 370)
+        )
+        self.text5 : Text = Text(
+            ">>",
+            self.font30,
+            (0, 0, 0),
+            center=(800, 580)
+        )
         
         
         self.play_again_text: Text = Text(
@@ -388,11 +402,15 @@ class Game:
                     self.screen.blit(self.mouseleft, [290, 270])
                     self.screen.blit(self.wasd, [250, 400])
                     self.screen.blit(self.arrows, [250, 570])
-
+                    self.screen.blit(self.ss_debris, [550, 300])
+                    self.screen.blit(self.collision, [540, 500])
+                    
 
                     self.text1.draw(self.screen)
                     self.text2.draw(self.screen)
                     self.text3.draw(self.screen)
+                    self.text4.draw(self.screen)
+                    self.text5.draw(self.screen)
                     # self.help_text.draw(self.screen)
 
 
