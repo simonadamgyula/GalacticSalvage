@@ -46,7 +46,6 @@ class Game:
         self.font15: pygame.font.Font = pygame.font.Font("font/Beyonders-6YoJM.ttf", 15)
         self.font_10: pygame.font.Font = pygame.font.Font("font/Anta-Regular.ttf", 25)
 
-        self.other_font = pygame.font.Font("font/ninifont-caps.otf", 50)
         self.font_color = pygame.Color(255, 87, 51)
 
         self.meteorite_spawn_rate: float = 0.5  # hány darab keletkezzen másodpercenként
@@ -83,17 +82,56 @@ class Game:
         self.screen_note: bool = False
         self.settings_screen: bool = False
 
+        self.wasd : pygame.Surface = pygame.image.load("img/how to play elements/wasd.png").convert_alpha()
+        self.wasd : pygame.Surface = pygame.transform.rotozoom(self.wasd, 0, 0.7)
+        
+        self.arrows : pygame.Surface = pygame.image.load("img/how to play elements/arrows1.png")
+        self.arrows : pygame.Surface = pygame.transform.rotozoom(self.arrows, 0, 0.7)
+
+        self.mouseleft : pygame.Surface = pygame.image.load("img/how to play elements/mouse_left.png")
+        self.mouseleft : pygame.Surface = pygame.transform.rotozoom(self.mouseleft, 0, 0.17)
+        
+        self.mouseleft : pygame.Surface = pygame.image.load("img/how to play elements/mouse_left.png")
+        self.mouseleft : pygame.Surface = pygame.transform.rotozoom(self.mouseleft, 0, 0.17)
+
+        self.ss_debris : pygame.Surface = pygame.image.load("img/how to play elements/spaceship_and_debris.png")
+        self.collision : pygame.Surface = pygame.image.load("img/how to play elements/collision.png")
+
+        self.text1 : Text = Text(
+            "Irányítás",
+            self.font30,
+            (0, 0, 0),
+            center=(350, 210)
+        )
+        self.text2 : Text = Text(
+            "vagy",
+            self.font15,
+            (0, 0, 0),
+            center=(335, 540)
+        )
+        self.text3 : Text = Text (
+            "Játék menete",
+            self.font30,
+            (0, 0, 0),
+            center=(900, 210)
+        )
+        self.text4 : Text = Text(
+            ">>   + pont",
+            self.font30,
+            (0, 0, 0),
+            center=(1170, 370)
+        )
+        self.text5 : Text = Text(
+            ">>",
+            self.font30,
+            (0, 0, 0),
+            center=(920, 590)
+        )
         self.play_again_text: Text = Text(
             "Visszalépéshez nyomd meg szóközt!",
             self.font20,
             (255, 255, 255),
             center=(int(self.screen_resolution[0] / 2), 550),
-        )
-        self.help_text: Text = Text(
-            "A ürhajó mozgását  a WASD billentyükkel vagy a nyilakkal irányítod,\n\na karját pedig abal egérkattintással. A célod minél több ürszemetet\n\nösszeszedni, miközben kerülgeted a meteorokat és póbálsz a pályán\n\nbelül maradni. Minden eggyes darab ürroncs után pontokat\n\nfogsz kapni amit fejlesztésekre tudsz elkölteni a menüben.\n\n\n\nHa túl könnyü a játék a beállítások között lézereket is tudsz\n\nbekapcsolni",
-            self.font20,
-            (255, 255, 255),
-            topleft=(175, 250),
         )
         self.title_text: Text = Text(
             "Galactic Salvage",
@@ -111,19 +149,20 @@ class Game:
             "Meghaltál!", self.font80, (255, 81, 81), center=(800, 450)
         )
         self.laser_button_text: Text = Text(
-            "Ezzel a beállítással lézereket kapcsolsz be ,amelyek folyamtosan\nnehezíteni fogják a játékot, cserébe 10 pont helyett 15 pontot fogsz\nmajd kapni. A lézerek véletlenszerü helyeken jönnek, és a 10. lézer\nután már kettö darabot kell kerülgetni egyszerre. ",
+            "Lézerek ki- és bekapcsolása.\nA játék során plusz pontokat kaphatsz, \nha vállalod ezt a nehezítést.\nA 10. lézer után már egyszerre 2-vel találkozhatsz.",
             self.font15,
             (255, 255, 255),
             topleft=(575, 290),
+            #"Ezzel a beállítással lézereket kapcsolsz be, amelyek folyamatosan\nnehezíteni fogják a játékot, cserébe 10 pont helyett 15 pontot fogsz\nmajd kapni. A lézerek véletlenszerü helyeken jönnek, és a 10. lézer\nután már kettö darabot kell kerülgetni egyszerre. "
         )
         self.sound_button_text: Text = Text(
-            "Minden háttérzenén kívüi hang ki -bekapcsolása.",
+            "Háttérzene kivételével minden hang ki- és bekapcsolása.",
             self.font15,
             (255, 255, 255),
             topleft=(575, 510),
         )
         self.music_button_text: Text = Text(
-            "Háttérzene ki -bekapcsolása.",
+            "Háttérzene ki- és bekapcsolása.",
             self.font15,
             (255, 255, 255),
             topleft=(575, 685),
@@ -357,7 +396,23 @@ class Game:
                 self.settings_button.draw(self.screen)
 
                 if self.screen_note:
-                    self.help_text.draw(self.screen)
+                    pygame.draw.rect(self.screen, "white", (200, 150, 1200, 600), border_radius=50)
+                    pygame.draw.rect(self.screen, "black", (500, 150, 10, 600))
+                    pygame.draw.rect(self.screen, "black", (200, 250, 1200, 10))
+
+                    self.screen.blit(self.mouseleft, [290, 270])
+                    self.screen.blit(self.wasd, [250, 400])
+                    self.screen.blit(self.arrows, [250, 570])
+                    self.screen.blit(self.ss_debris, [550, 300])
+                    self.screen.blit(self.collision, [670, 520])
+                    
+                    self.text1.draw(self.screen)
+                    self.text2.draw(self.screen)
+                    self.text3.draw(self.screen)
+                    self.text4.draw(self.screen)
+                    self.text5.draw(self.screen)
+
+
                 elif self.settings_screen:
                     self.laser_button.draw(self.screen)
                     self.sound_button.draw(self.screen)
