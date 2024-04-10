@@ -17,7 +17,6 @@ GameState = Enum("GameState", ["MAIN_MENU", "IN_GAME", "UPGRADE_MENU"])
 
 
 class Game:
-
     def __init__(self) -> None:
         pygame.init()
 
@@ -82,46 +81,46 @@ class Game:
         self.screen_note: bool = False
         self.settings_screen: bool = False
 
-        self.wasd : pygame.Surface = pygame.image.load("img/how to play elements/wasd.png").convert_alpha()
-        self.wasd : pygame.Surface = pygame.transform.rotozoom(self.wasd, 0, 0.7)
+        self.wasd: pygame.Surface = pygame.image.load("img/how to play elements/wasd.png").convert_alpha()
+        self.wasd: pygame.Surface = pygame.transform.rotozoom(self.wasd, 0, 0.7)
         
-        self.arrows : pygame.Surface = pygame.image.load("img/how to play elements/arrows1.png")
-        self.arrows : pygame.Surface = pygame.transform.rotozoom(self.arrows, 0, 0.7)
+        self.arrows: pygame.Surface = pygame.image.load("img/how to play elements/arrows1.png")
+        self.arrows: pygame.Surface = pygame.transform.rotozoom(self.arrows, 0, 0.7)
 
-        self.mouseleft : pygame.Surface = pygame.image.load("img/how to play elements/mouse_left.png")
-        self.mouseleft : pygame.Surface = pygame.transform.rotozoom(self.mouseleft, 0, 0.17)
+        self.mouseleft: pygame.Surface = pygame.image.load("img/how to play elements/mouse_left.png")
+        self.mouseleft: pygame.Surface = pygame.transform.rotozoom(self.mouseleft, 0, 0.17)
         
-        self.mouseleft : pygame.Surface = pygame.image.load("img/how to play elements/mouse_left.png")
-        self.mouseleft : pygame.Surface = pygame.transform.rotozoom(self.mouseleft, 0, 0.17)
+        self.mouseleft: pygame.Surface = pygame.image.load("img/how to play elements/mouse_left.png")
+        self.mouseleft: pygame.Surface = pygame.transform.rotozoom(self.mouseleft, 0, 0.17)
 
-        self.ss_debris : pygame.Surface = pygame.image.load("img/how to play elements/spaceship_and_debris.png")
-        self.collision : pygame.Surface = pygame.image.load("img/how to play elements/collision.png")
+        self.ss_debris: pygame.Surface = pygame.image.load("img/how to play elements/spaceship_and_debris.png")
+        self.collision: pygame.Surface = pygame.image.load("img/how to play elements/collision.png")
 
-        self.text1 : Text = Text(
+        self.text1: Text = Text(
             "Irányítás",
             self.font30,
             (0, 0, 0),
             center=(350, 210)
         )
-        self.text2 : Text = Text(
+        self.text2: Text = Text(
             "vagy",
             self.font15,
             (0, 0, 0),
             center=(335, 540)
         )
-        self.text3 : Text = Text (
+        self.text3: Text = Text(
             "Játék menete",
             self.font30,
             (0, 0, 0),
             center=(900, 210)
         )
-        self.text4 : Text = Text(
+        self.text4: Text = Text(
             ">>   + pont",
             self.font30,
             (0, 0, 0),
             center=(1170, 370)
         )
-        self.text5 : Text = Text(
+        self.text5: Text = Text(
             ">>",
             self.font30,
             (0, 0, 0),
@@ -153,7 +152,6 @@ class Game:
             self.font15,
             (255, 255, 255),
             topleft=(575, 290),
-            #"Ezzel a beállítással lézereket kapcsolsz be, amelyek folyamatosan\nnehezíteni fogják a játékot, cserébe 10 pont helyett 15 pontot fogsz\nmajd kapni. A lézerek véletlenszerü helyeken jönnek, és a 10. lézer\nután már kettö darabot kell kerülgetni egyszerre. "
         )
         self.sound_button_text: Text = Text(
             "Háttérzene kivételével minden hang ki- és bekapcsolása.",
@@ -196,7 +194,7 @@ class Game:
             "white",
             lambda: self.set_game_state(GameState["UPGRADE_MENU"]),
             lambda: self.game_state == GameState["MAIN_MENU"],
-            center=(int(self.screen_resolution[0] / 2), 750),
+            center=(int(self.screen_resolution[0] / 2), 790),
         )
         self.back_button: Button = Button(
             (150, 100),
